@@ -1,0 +1,411 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+		"name": "MiniFarm API",
+		"description": "API para la gestión de granjas y animales",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Usuarios",
+			"item": [
+				{
+					"name": "Registrar Usuario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"usuario@ejemplo.com\",\n    \"password\": \"contraseña123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "users", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"usuario@ejemplo.com\",\n    \"password\": \"contraseña123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "users", "login"]
+						}
+					}
+				},
+				{
+					"name": "Obtener Todos los Usuarios",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": ["{{base_url}}"],
+							"path": ["api", "users"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Usuario",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"nuevo@email.com\",\n    \"password\": \"nuevaContraseña123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Usuario",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Granjas",
+			"item": [
+				{
+					"name": "Obtener Todas las Granjas",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/farms",
+							"host": ["{{base_url}}"],
+							"path": ["api", "farms"]
+						}
+					}
+				},
+				{
+					"name": "Obtener Granja por ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/farms/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "farms", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Crear Granja",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Granja Ejemplo\",\n    \"farm_type_id\": 1,\n    \"production_type_id\": 1,\n    \"image_path\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/farms",
+							"host": ["{{base_url}}"],
+							"path": ["api", "farms"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Granja",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Granja Actualizada\",\n    \"farm_type_id\": 2,\n    \"production_type_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/farms/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "farms", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Granja",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/farms/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "farms", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Animales",
+			"item": [
+				{
+					"name": "Obtener Animales por Granja",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/animals/farm/:farmId",
+							"host": ["{{base_url}}"],
+							"path": ["api", "animals", "farm", ":farmId"],
+							"variable": [
+								{
+									"key": "farmId",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Obtener Animal por ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/animals/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "animals", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Crear Animal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"animal_type\": \"Vaca\",\n    \"identification_number\": \"VAC001\",\n    \"weight\": 500,\n    \"estimated_production\": 20,\n    \"sanitary_register\": \"SR001\",\n    \"age\": 3,\n    \"farm_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/animals",
+							"host": ["{{base_url}}"],
+							"path": ["api", "animals"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Animal",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"weight\": 550,\n    \"estimated_production\": 25,\n    \"age\": 4\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/animals/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "animals", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Animal",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/animals/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "animals", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Tipos",
+			"item": [
+				{
+					"name": "Obtener Tipos de Granja",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/types/farm-types",
+							"host": ["{{base_url}}"],
+							"path": ["api", "types", "farm-types"]
+						}
+					}
+				},
+				{
+					"name": "Obtener Tipos de Producción",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/types/production-types",
+							"host": ["{{base_url}}"],
+							"path": ["api", "types", "production-types"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Obtener Estadísticas",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/stats",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard", "stats"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:4000"
+		},
+		{
+			"key": "token",
+			"value": "tu_token_jwt_aquí"
+		}
+	]
+} 

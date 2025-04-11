@@ -15,6 +15,12 @@ export const registerUser = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Email y password son requeridos' });
     }
 
+    // Verificar si el email ya existe
+    const existingUser = await userRepository.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'El email ya está registrado' });
+    }
+
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 

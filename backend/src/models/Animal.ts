@@ -17,8 +17,8 @@ export class Animal {
   @Column({ type: 'varchar' })
   animal_type!: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  identification_number!: string | null;
+  @Column({ type: 'varchar' })
+  identification_number!: string;
 
   @Column({ type: 'float', nullable: true })
   weight!: number | null;
@@ -26,8 +26,8 @@ export class Animal {
   @Column({ type: 'float', nullable: true })
   estimated_production!: number | null;
 
-  @Column({ type: 'varchar', nullable: true })
-  sanitary_register!: string | null;
+  @Column({ type: 'varchar' })
+  sanitary_register!: string;
 
   @Column({ type: 'int', nullable: true })
   age!: number | null;

@@ -1,153 +1,106 @@
 import 'reflect-metadata';
-import { AppDataSource } from './config/dataSource';
-import { User } from './models/User';
+import { DataSource } from 'typeorm';
+import { FarmType } from './models/FarmType';
+import { ProductionType } from './models/ProductionType';
 import { Farm } from './models/Farm';
 import { Animal } from './models/Animal';
-import bcrypt from 'bcrypt';
+import { User } from './models/User';
+import * as bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
 
-async function seedData() {
+dotenv.config();
+
+const dataSource = new DataSource({
+  type: 'postgres',
+  url: process.env.CONNECTION_STRING,
+  entities: [User, Farm, Animal, FarmType, ProductionType],
+  synchronize: true,
+});
+
+async function seed() {
   try {
-    console.log('Conectando BD para seeding...');
-  await AppDataSource.initialize();
-    console.log('Conexión TypeORM inicializada para seeding...');
+    await dataSource.initialize();
 
-    const userRepo = AppDataSource.getRepository(User);
-    const farmRepo = AppDataSource.getRepository(Farm);
-    const animalRepo = AppDataSource.getRepository(Animal);
+    // Creamos tipos de granja
+    const farmTypes = await dataSource.getRepository(FarmType).save([
+      { name: 'Bovina' },
+      { name: 'Ovina' },
+      { name: 'Porcina' }
+    ]);
 
-    // ==========================
-    // 1. Crear Users
-    // ==========================
-    const saltRounds = 10;
+    // Creamos tipos de producción
+    const productionTypes = await dataSource.getRepository(ProductionType).save([
+      { name: 'Cárnica' },
+      { name: 'Láctea' }
+    ]);
 
-    const adminPass = await bcrypt.hash('123456', saltRounds);
-    const userPass = await bcrypt.hash('123456', saltRounds);
-
-    const adminUser = userRepo.create({
-      email: 'admin@mail.com',
-      password_hash: adminPass,
+    // Creamos usuario administrador
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const admin = await dataSource.getRepository(User).save({
+      email: 'admin@minifarm.com',
+      password_hash: hashedPassword,
       role: 'admin'
     });
-    const normalUser = userRepo.create({
-      email: 'user@mail.com',
-      password_hash: userPass,
-      role: 'user'
-    });
 
-    await userRepo.save([adminUser, normalUser]);
-    console.log('Usuarios creados:', [adminUser.email, normalUser.email]);
+    // Creamos algunas granjas de ejemplo
+    const farmRepository = dataSource.getRepository(Farm);
+    const farm1 = new Farm();
+    farm1.name = 'Granja Bovina Cárnica';
+    farm1.farm_type = farmTypes[0];
+    farm1.production_type = productionTypes[0];
+    farm1.image_path = null;
 
-    // ==========================
-    // 2. Crear Farms
-    // ==========================
-    const farm1 = farmRepo.create({
-      name: 'Granja Las Rosas',
-      farm_type: 'bovina',
-      production_type: 'leche',
-      image_path: '/images/granja_las_rosas.jpg'
-    });
-    const farm2 = farmRepo.create({
-      name: 'Granja El Prado',
-      farm_type: 'porcina',
-      production_type: 'carne',
-      image_path: '/images/granja_el_prado.jpg'
-    });
-    const farm3 = farmRepo.create({
-      name: 'Granja Los Pinos',
-      farm_type: 'ovina',
-      production_type: 'carne',
-      image_path: '/images/granja_los_pinos.jpg'
-    });
+    const farm2 = new Farm();
+    farm2.name = 'Granja Ovina Láctea';
+    farm2.farm_type = farmTypes[1];
+    farm2.production_type = productionTypes[1];
+    farm2.image_path = null;
 
-    await farmRepo.save([farm1, farm2, farm3]);
-    console.log('Granjas creadas:', [farm1.name, farm2.name, farm3.name]);
+    const farm3 = new Farm();
+    farm3.name = 'Granja Porcina Cárnica';
+    farm3.farm_type = farmTypes[2];
+    farm3.production_type = productionTypes[0];
+    farm3.image_path = null;
 
-    // ==========================
-    // 3. Crear Animals
-    // ==========================
-    // Farm1 -> bovina (vacas)
-    const animal1 = animalRepo.create({
-      animal_type: 'vaca',
-      identification_number: 'V-001',
-      weight: 450.5,
-      estimated_production: 30,
-      sanitary_register: 'REG-ABC-001',
-      age: 3,
-      incidents: null, // sin incidencias (vacío)
-      farm: farm1
-    });
-    const animal2 = animalRepo.create({
-      animal_type: 'vaca',
-      identification_number: 'V-002',
-      weight: 520,
-      estimated_production: 32,
-      sanitary_register: 'REG-ABC-002',
-      age: 4,
-      incidents: 'Cojea levemente',
-      farm: farm1
-    });
+    const farms = await farmRepository.save([farm1, farm2, farm3]);
 
-    // Farm2 -> porcina (cerdos)
-    const animal3 = animalRepo.create({
-      animal_type: 'cerdo',
-      identification_number: 'C-101',
-      weight: 120.5,
-      estimated_production: 10,
-      sanitary_register: 'REG-DEF-101',
-      age: 1,
-      incidents: null, // sin incidencias
-      farm: farm2
-    });
-    const animal4 = animalRepo.create({
-      animal_type: 'cerdo',
-      identification_number: 'C-102',
-      weight: 135.0,
-      estimated_production: 11,
-      sanitary_register: 'REG-DEF-102',
-      age: 2,
-      incidents: 'Sarna detectada',
-      farm: farm2
-    });
+    // Crear algunos animales de ejemplo
+    const animalRepository = dataSource.getRepository(Animal);
+    const animal1 = new Animal();
+    animal1.animal_type = 'Vaca';
+    animal1.identification_number = 'VAC001';
+    animal1.weight = 500;
+    animal1.estimated_production = 20;
+    animal1.sanitary_register = 'SR001';
+    animal1.age = 3;
+    animal1.farm = farms[0];
 
-    // Farm3 -> ovina (ovejas)
-    const animal5 = animalRepo.create({
-      animal_type: 'oveja',
-      identification_number: 'O-201',
-      weight: 60,
-      estimated_production: 6,
-      sanitary_register: 'REG-XYZ-201',
-      age: 2,
-      incidents: 'Ha perdido algo de peso',
-      farm: farm3
-    });
-    const animal6 = animalRepo.create({
-      animal_type: 'oveja',
-      identification_number: 'O-202',
-      weight: 65,
-      estimated_production: 7,
-      sanitary_register: 'REG-XYZ-202',
-      age: 3,
-      incidents: null, // sin incidencias
-      farm: farm3
-    });
+    const animal2 = new Animal();
+    animal2.animal_type = 'Oveja';
+    animal2.identification_number = 'OVE001';
+    animal2.weight = 60;
+    animal2.estimated_production = 2;
+    animal2.sanitary_register = 'SR002';
+    animal2.age = 2;
+    animal2.farm = farms[1];
 
-    await animalRepo.save([animal1, animal2, animal3, animal4, animal5, animal6]);
-    console.log('Animales creados.');
+    const animal3 = new Animal();
+    animal3.animal_type = 'Cerdo';
+    animal3.identification_number = 'CER001';
+    animal3.weight = 100;
+    animal3.estimated_production = 0;
+    animal3.sanitary_register = 'SR003';
+    animal3.age = 1;
+    animal3.farm = farms[2];
 
-    await AppDataSource.destroy();
-    console.log('Seed finalizado con éxito. Conexión cerrada.');
+    await animalRepository.save([animal1, animal2, animal3]);
+
+    console.log('Seed completado exitosamente!');
   } catch (error) {
-    console.error('Error en el seeding:', error);
+    console.error('Error durante el seed:', error);
+  } finally {
+    await dataSource.destroy();
   }
 }
 
-// Ejecutar la función
-seedData()
-  .then(() => {
-    console.log('Seeding completado!');
-    process.exit(0); 
-  })
-  .catch((err) => {
-    console.error('Error en seeding:', err);
-    process.exit(1);
-  });
+seed();

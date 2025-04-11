@@ -2,9 +2,13 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn
 } from 'typeorm';
+import { FarmType } from './FarmType';
+import { ProductionType } from './ProductionType';
 
 @Entity('farms')
 export class Farm {
@@ -14,11 +18,13 @@ export class Farm {
   @Column({ type: 'varchar' })
   name!: string;
 
-  @Column({ type: 'varchar' })
-  farm_type!: string;
+  @ManyToOne(() => FarmType)
+  @JoinColumn({ name: 'farm_type_id' })
+  farm_type!: FarmType;
 
-  @Column({ type: 'varchar' })
-  production_type!: string;
+  @ManyToOne(() => ProductionType)
+  @JoinColumn({ name: 'production_type_id' })
+  production_type!: ProductionType;
 
   @Column({ type: 'varchar', nullable: true })
   image_path!: string | null;
