@@ -34,4 +34,26 @@ export class Farm {
 
   @UpdateDateColumn()
   updated_at!: Date;
+  
+  /**
+   * Crea una nueva instancia de Farm con los valores proporcionados
+   */
+  static create(params: {
+    id?: number;
+    name: string;
+    farm_type?: FarmType;
+    production_type?: ProductionType;
+    image_path?: string | null;
+  }): Farm {
+    const farm = new Farm();
+    
+    if (params.id) farm.id = params.id;
+    farm.name = params.name;
+    
+    if (params.farm_type) farm.farm_type = params.farm_type;
+    if (params.production_type) farm.production_type = params.production_type;
+    farm.image_path = params.image_path ?? null;
+    
+    return farm;
+  }
 }

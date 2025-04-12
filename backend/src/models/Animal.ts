@@ -44,4 +44,35 @@ export class Animal {
 
   @UpdateDateColumn()
   updated_at!: Date;
+  
+  /**
+   * Crea una nueva instancia de Animal con los valores proporcionados
+   */
+  static create(params: {
+    id?: number;
+    animal_type: string;
+    identification_number: string;
+    sanitary_register: string;
+    weight?: number | null;
+    estimated_production?: number | null;
+    age?: number | null;
+    incidents?: string | null;
+    farm?: Farm;
+  }): Animal {
+    const animal = new Animal();
+    
+    if (params.id) animal.id = params.id;
+    animal.animal_type = params.animal_type;
+    animal.identification_number = params.identification_number;
+    animal.sanitary_register = params.sanitary_register;
+    
+    animal.weight = params.weight ?? null;
+    animal.estimated_production = params.estimated_production ?? null;
+    animal.age = params.age ?? null;
+    animal.incidents = params.incidents ?? null;
+    
+    if (params.farm) animal.farm = params.farm;
+    
+    return animal;
+  }
 }
