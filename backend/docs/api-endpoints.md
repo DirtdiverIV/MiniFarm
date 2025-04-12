@@ -116,34 +116,18 @@ Authorization: Bearer <token_jwt>
 }
 ```
 
-### Ejemplo de Registro de Animal con Imagen (FormData)
-
-```
-POST /api/animals
-Content-Type: multipart/form-data
-Authorization: Bearer <token_jwt>
-
-Form data:
-  name: Nombre del Animal
-  birth_date: 2023-01-01
-  breed: Raza
-  farm_id: 1
-  production_type_id: 2
-  image: [archivo de imagen]
-```
-
-### Ejemplo de Actualización de Animal con Imagen
+### Ejemplo de Actualización de Animal
 
 ```
 PUT /api/animals/:id
-Content-Type: multipart/form-data
+Content-Type: application/json
 Authorization: Bearer <token_jwt>
 
-Form data:
-  name: Nuevo Nombre del Animal
-  birth_date: 2023-01-01
-  breed: Nueva Raza
-  image: [archivo de imagen]
+{
+  "name": "Nuevo Nombre del Animal",
+  "birth_date": "2023-01-01",
+  "breed": "Nueva Raza"
+}
 ```
 
 ## Tipos de Granja
@@ -179,12 +163,11 @@ Todas las imágenes subidas están disponibles a través de las siguientes rutas
 | Recurso | URL |
 |---------|-----|
 | Imágenes de Granjas | `/uploads/farms/{nombre_archivo}` |
-| Imágenes de Animales | `/uploads/animals/{nombre_archivo}` |
 
 ## Notas sobre la Carga de Imágenes
 
 - Solo se aceptan formatos de imagen: JPEG, PNG, GIF y WEBP
 - El tamaño máximo de archivo es de 5MB
-- Al subir una nueva imagen para un recurso existente, la imagen anterior se elimina automáticamente
+- Al subir una nueva imagen para una granja existente, la imagen anterior se elimina automáticamente
 - Las imágenes se almacenan con nombres únicos generados basados en la fecha y hora de subida
-- Al eliminar un recurso (granja o animal), también se elimina su imagen asociada 
+- Al eliminar una granja, también se elimina su imagen asociada 
