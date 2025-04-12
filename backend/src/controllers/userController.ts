@@ -6,7 +6,7 @@ import { AppDataSource } from '../config/dataSource';
 import { User } from '../models/User';
 
 const userRepository = AppDataSource.getRepository(User);
-const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
+const JWT_SECRET = process.env.JWT_SECRET === undefined ? 'default_secret' : process.env.JWT_SECRET;
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
@@ -27,7 +27,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const newUser = userRepository.create({
       email,
       password_hash: passwordHash,
-      role: role || 'user'
+      role: role === undefined ? 'user' : role
     });
 
     const savedUser = await userRepository.save(newUser);

@@ -155,22 +155,22 @@ const Dashboard = () => {
         }}>
           <StatCard
             title="Total de Animales"
-            value={dashboardApi.data?.total_animals || 0}
+            value={dashboardApi.data === null ? 0 : dashboardApi.data.total_animals}
             icon={<PetsIcon />}
           />
           <StatCard
             title="Total de Granjas"
-            value={farmsApi.data?.length || 0}
+            value={farmsApi.data === null ? 0 : farmsApi.data.length}
             icon={<AgricultureIcon />}
           />
           <StatCard
             title="Producción Cárnica"
-            value={dashboardApi.data?.total_carne_production || 0}
+            value={dashboardApi.data === null ? 0 : dashboardApi.data.total_carne_production}
             icon={<WaterDropIcon />}
           />
           <StatCard
             title="Producción Láctea"
-            value={dashboardApi.data?.total_leche_production || 0}
+            value={dashboardApi.data === null ? 0 : dashboardApi.data.total_leche_production}
             icon={<MeatIcon />}
           />
         </Box>
@@ -206,7 +206,7 @@ const Dashboard = () => {
         {/* Tabla de animales con incidencias */}
         <Box sx={{ mt: 4 }}>
           <AnimalsTable 
-            animals={dashboardApi.data?.animals_with_incidents.map(convertToAnimal) || []}
+            animals={dashboardApi.data === null ? [] : dashboardApi.data.animals_with_incidents.map(convertToAnimal)}
             title="Animales con Incidencias"
           />
         </Box>

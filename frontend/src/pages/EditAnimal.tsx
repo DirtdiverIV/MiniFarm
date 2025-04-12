@@ -23,7 +23,6 @@ const EditAnimal = () => {
   // Estados para datos y UI
   const [initialValues, setInitialValues] = useState<AnimalFormValues | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('info');
@@ -38,18 +37,18 @@ const EditAnimal = () => {
         const animalData = await getAnimalById(parseInt(id));
         
         setInitialValues({
-          farm_id: animalData.farm?.id || 0,
+          farm_id: animalData.farm?.id === undefined ? 0 : animalData.farm.id,
           animal_type: animalData.animal_type,
           identification_number: animalData.identification_number,
           weight: animalData.weight,
           estimated_production: animalData.estimated_production,
           sanitary_register: animalData.sanitary_register,
           age: animalData.age,
-          incidents: animalData.incidents
+          incidents: animalData.incidents,
+          has_incidents: !!animalData.incidents
         });
       } catch (err) {
         console.error('Error al cargar los datos del animal:', err);
-        setError('Error al cargar los datos del animal');
         showAlert('Error al cargar los datos del animal', 'error');
       } finally {
         setLoading(false);
@@ -88,7 +87,8 @@ const EditAnimal = () => {
       
       // Esperar un momento antes de redirigir para que el usuario vea el mensaje
       setTimeout(() => {
-        navigate(`/farms/${farmId || updatedAnimal.farm?.id}`);
+        const farmIdToUse = farmId === undefined ? (updatedAnimal.farm?.id === undefined ? 0 : updatedAnimal.farm.id) : farmId;
+        navigate(`/farms/${farmIdToUse}`);
       }, 1500);
       
     } catch (error) {
@@ -101,7 +101,8 @@ const EditAnimal = () => {
   
   // Manejar el regreso a la página de detalles de granja
   const handleBack = () => {
-    navigate(`/farms/${farmId || initialValues?.farm_id}`);
+    const farmIdToUse = farmId === undefined ? (initialValues?.farm_id === undefined ? 0 : initialValues.farm_id) : farmId;
+    navigate(`/farms/${farmIdToUse}`);
   };
   
   // Renderizar estado de carga

@@ -32,10 +32,10 @@ export const createAnimal = async (req: Request, res: Response) => {
     const newAnimal = animalRepository.create({
       animal_type,
       identification_number: identification_number || null,
-      weight: weight ?? null,
-      estimated_production: estimated_production ?? null,
+      weight: weight === undefined ? null : weight,
+      estimated_production: estimated_production === undefined ? null : estimated_production,
       sanitary_register: sanitary_register || null,
-      age: age ?? null,
+      age: age === undefined ? null : age,
       incidents: incidents || null,
       farm 
     });
@@ -103,13 +103,13 @@ export const updateAnimal = async (req: Request, res: Response) => {
       animal.farm = farm;
     }
 
-    animal.animal_type = animal_type ?? animal.animal_type;
-    animal.identification_number = identification_number ?? animal.identification_number;
-    animal.weight = weight ?? animal.weight;
-    animal.estimated_production = estimated_production ?? animal.estimated_production;
-    animal.sanitary_register = sanitary_register ?? animal.sanitary_register;
-    animal.age = age ?? animal.age;
-    animal.incidents = incidents ?? animal.incidents;
+    animal.animal_type = animal_type === undefined ? animal.animal_type : animal_type;
+    animal.identification_number = identification_number === undefined ? animal.identification_number : identification_number;
+    animal.weight = weight === undefined ? animal.weight : weight;
+    animal.estimated_production = estimated_production === undefined ? animal.estimated_production : estimated_production;
+    animal.sanitary_register = sanitary_register === undefined ? animal.sanitary_register : sanitary_register;
+    animal.age = age === undefined ? animal.age : age;
+    animal.incidents = incidents === undefined ? animal.incidents : incidents;
 
     const updatedAnimal = await animalRepository.save(animal);
     return res.json({ message: 'Animal actualizado', animal: updatedAnimal });

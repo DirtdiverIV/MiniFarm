@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
+const JWT_SECRET = process.env.JWT_SECRET === undefined ? 'default_secret' : process.env.JWT_SECRET;
 
 /**
  * Verifica el token JWT en los headers Authorization: Bearer <token>.

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ApiResponse, ApiError } from '../types/common';
+import { ApiResponse } from '../types/common';
 
 interface UseApiState<T> {
   data: T | null;
@@ -27,14 +27,14 @@ export const useApi = <T, P = any>(
   }
 ): UseApiReturn<T, P> => {
   const [state, setState] = useState<UseApiState<T>>({
-    data: options?.initialData || null,
+    data: options?.initialData === undefined ? null : options.initialData,
     loading: false,
     error: null
   });
 
   const reset = useCallback(() => {
     setState({
-      data: options?.initialData || null,
+      data: options?.initialData === undefined ? null : options.initialData,
       loading: false,
       error: null
     });
@@ -47,7 +47,7 @@ export const useApi = <T, P = any>(
       const response = await apiFunction(params);
 
       if (!response.success) {
-        throw new Error(response.message || 'Error en la operación');
+        throw new Error(response.message === undefined ? 'Error en la operación' : response.message);
       }
 
       setState(prev => ({ ...prev, data: response.data, loading: false }));

@@ -18,7 +18,11 @@ interface UseTableDataReturn<T> {
 }
 
 const getNestedValue = (obj: any, path: string): any => {
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  if (!obj) return undefined;
+  return path.split('.').reduce((acc, part) => {
+    if (acc === null || acc === undefined) return undefined;
+    return acc[part];
+  }, obj);
 };
 
 export function useTableData<T>({ 

@@ -60,15 +60,11 @@ describe('Dashboard Controller', () => {
   let mockResponse: Partial<Response>;
 
   beforeEach(() => {
-    // Configurar mocks para Request y Response
     mockRequest = {};
-    
     mockResponse = {
       json: jest.fn().mockReturnThis(),
       status: jest.fn().mockReturnThis()
     };
-
-    // Limpiar todos los mocks
     jest.clearAllMocks();
   });
 
@@ -114,23 +110,22 @@ describe('Dashboard Controller', () => {
       
       // Configurar mock para find con diferentes parámetros
       mockAnimalRepository.find.mockImplementation((params: any) => {
-        if (params && params.where && Array.isArray(params.where) && params.where.length > 0) {
-          // Verificar si estamos buscando animales de granjas cárnicas o lácteas
-          const farmId = params.where[0].farm.id;
-          if (farmId === 1) { // Granja cárnica
+        const hasValidWhereClause = params?.where && Array.isArray(params.where) && params.where.length > 0;
+        if (hasValidWhereClause) {
+          const farmId = params.where[0]?.farm?.id;
+          if (farmId === 1) {
             return Promise.resolve(mockCarneAnimals);
-          } else if (farmId === 2) { // Granja láctea
+          } else if (farmId === 2) {
             return Promise.resolve(mockLecheAnimals);
           }
-        } else if (params && params.where && params.where.incidents) {
-          // Estamos buscando animales con incidencias
+        } else if (params?.where?.incidents) {
           return Promise.resolve(mockAnimalsWithIncidents);
         }
         return Promise.resolve([]);
       });
 
       // Ejecutar el controlador
-      await dashboardController.getDashboardStats(mockRequest as Request, mockResponse as Response);
+      await dashboardController.getDashboardStats(mockRequest as unknown as Request, mockResponse as unknown as Response);
 
       // Verificar que se llamen los métodos correctos
       expect(mockAnimalRepository.count).toHaveBeenCalled();
@@ -157,12 +152,8 @@ describe('Dashboard Controller', () => {
     });
 
     test('debería manejar errores correctamente', async () => {
-      // Configurar mock para simular error
       mockAnimalRepository.count.mockRejectedValue(new Error('Error de base de datos'));
-
-      // Ejecutar el controlador
-      await dashboardController.getDashboardStats(mockRequest as Request, mockResponse as Response);
-
+      await dashboardController.getDashboardStats(mockRequest as unknown as Request, mockResponse as unknown as Response);
       // Verificar resultados
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({

@@ -43,7 +43,7 @@ class ErrorBoundary extends Component<Props, State> {
             ¡Ups! Algo salió mal
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            {this.state.error?.message || "Ha ocurrido un error inesperado"}
+            {this.state.error === null ? "Ha ocurrido un error inesperado" : this.state.error.message}
           </Typography>
           <Button
             variant="contained"

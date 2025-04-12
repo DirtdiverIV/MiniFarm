@@ -25,20 +25,20 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     const lecheType = productionTypes.find(pt => pt.name === 'Láctea');
 
     // Calcular producción estimada de carne
-    const carneFarms = farms.filter(farm => farm.production_type.id === carneType?.id);
+    const carneFarms = farms.filter(farm => farm.production_type?.id === carneType?.id);
     const carneAnimals = await animalRepository.find({
       where: carneFarms.map(farm => ({ farm: { id: farm.id } }))
     });
     const totalCarneProduction = carneAnimals.reduce((sum, animal) => 
-      sum + (animal.estimated_production || 0), 0);
+      sum + (animal.estimated_production === undefined ? 0 : animal.estimated_production), 0);
 
     // Calcular producción estimada de leche
-    const lecheFarms = farms.filter(farm => farm.production_type.id === lecheType?.id);
+    const lecheFarms = farms.filter(farm => farm.production_type?.id === lecheType?.id);
     const lecheAnimals = await animalRepository.find({
       where: lecheFarms.map(farm => ({ farm: { id: farm.id } }))
     });
     const totalLecheProduction = lecheAnimals.reduce((sum, animal) => 
-      sum + (animal.estimated_production || 0), 0);
+      sum + (animal.estimated_production === undefined ? 0 : animal.estimated_production), 0);
 
     // Obtener animales con incidencias
     const animalsWithIncidents = await animalRepository.find({

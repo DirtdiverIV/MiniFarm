@@ -29,21 +29,14 @@ const userController = require('../../controllers/userController');
 describe('User Controller', () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
-  let responseObject: any;
 
   beforeEach(() => {
-    // Reiniciar los mocks antes de cada prueba
-    jest.clearAllMocks();
-    
-    // Configurar el mock de response
-    responseObject = {};
+    mockRequest = {};
     mockResponse = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockImplementation(result => {
-        responseObject = result;
-        return mockResponse;
-      })
+      json: jest.fn().mockReturnThis()
     };
+    jest.clearAllMocks();
   });
 
   describe('registerUser', () => {

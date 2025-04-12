@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useState, useContext, useEffect, ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser, registerUser } from '../services/authService';
 
@@ -85,7 +85,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       navigate('/');
     } catch (error: unknown) {
       const apiError = error as ApiError;
-      setError(apiError.response?.data?.error || 'Error al iniciar sesión');
+      const errorMessage = apiError.response?.data?.error;
+      setError(errorMessage === undefined ? 'Error al iniciar sesión' : errorMessage);
       throw error;
     } finally {
       setLoading(false);
@@ -102,7 +103,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       navigate('/login');
     } catch (error: unknown) {
       const apiError = error as ApiError;
-      setError(apiError.response?.data?.error || 'Error al registrar');
+      const errorMessage = apiError.response?.data?.error;
+      setError(errorMessage === undefined ? 'Error al registrar' : errorMessage);
       throw error;
     } finally {
       setLoading(false);
@@ -117,7 +119,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     navigate('/login');
   };
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     isAuthenticated: !!user,
     loading,
@@ -125,7 +127,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     register,
     logout,
     error
-  };
+  }), [user, loading, error]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

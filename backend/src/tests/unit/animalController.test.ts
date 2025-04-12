@@ -46,23 +46,23 @@ describe('Animal Controller', () => {
   let mockResponse: Partial<Response>;
   
   beforeEach(() => {
-    jest.clearAllMocks();
-    
+    mockRequest = {};
     mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis()
     };
+    jest.clearAllMocks();
   });
   
   describe('createAnimal', () => {
-    test('debería validar campos obligatorios', async () => {
+    test('debería validar campos requeridos', async () => {
       mockRequest = {
         body: {
           identification_number: 'V001'
         }
       };
       
-      await animalController.createAnimal(mockRequest as Request, mockResponse as Response);
+      await animalController.createAnimal(mockRequest, mockResponse);
       
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({ 
@@ -81,7 +81,7 @@ describe('Animal Controller', () => {
 
       mockRepositories.farmRepository.findOne.mockResolvedValue(null);
       
-      await animalController.createAnimal(mockRequest as Request, mockResponse as Response);
+      await animalController.createAnimal(mockRequest, mockResponse);
       
       expect(mockRepositories.farmRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
       expect(mockResponse.status).toHaveBeenCalledWith(404);
@@ -111,7 +111,7 @@ describe('Animal Controller', () => {
       mockRepositories.animalRepository.create.mockReturnValue(mockAnimal);
       mockRepositories.animalRepository.save.mockResolvedValue(mockAnimal);
       
-      await animalController.createAnimal(mockRequest as Request, mockResponse as Response);
+      await animalController.createAnimal(mockRequest, mockResponse);
       
       expect(mockRepositories.farmRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
       expect(mockRepositories.animalRepository.create).toHaveBeenCalled();
@@ -139,7 +139,7 @@ describe('Animal Controller', () => {
 
       mockRepositories.animalRepository.find.mockResolvedValue(mockAnimals);
       
-      await animalController.getAnimalsByFarm(mockRequest as Request, mockResponse as Response);
+      await animalController.getAnimalsByFarm(mockRequest, mockResponse);
       
       expect(mockRepositories.animalRepository.find).toHaveBeenCalledWith({ where: { farm: { id: 1 } } });
       expect(mockResponse.json).toHaveBeenCalledWith(mockAnimals);
@@ -163,7 +163,7 @@ describe('Animal Controller', () => {
 
       mockRepositories.animalRepository.findOne.mockResolvedValue(mockAnimal);
       
-      await animalController.getAnimalById(mockRequest as Request, mockResponse as Response);
+      await animalController.getAnimalById(mockRequest, mockResponse);
       
       expect(mockRepositories.animalRepository.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
@@ -181,7 +181,7 @@ describe('Animal Controller', () => {
 
       mockRepositories.animalRepository.findOne.mockResolvedValue(null);
       
-      await animalController.getAnimalById(mockRequest as Request, mockResponse as Response);
+      await animalController.getAnimalById(mockRequest, mockResponse);
       
       expect(mockResponse.status).toHaveBeenCalledWith(404);
       expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Animal no encontrado' });

@@ -38,7 +38,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT === undefined ? 4000 : process.env.PORT;
 
 AppDataSource.initialize()
   .then(() => {

@@ -51,9 +51,9 @@ async function seed() {
     
     // Crear array con tipos existentes o nuevos
     farmTypes = [
-      existingBovinaType || await farmTypeRepository.save({ name: 'Bovina' }),
-      existingOvinaType || await farmTypeRepository.save({ name: 'Ovina' }),
-      existingPorcinaType || await farmTypeRepository.save({ name: 'Porcina' })
+      existingBovinaType === null ? await farmTypeRepository.save({ name: 'Bovina' }) : existingBovinaType,
+      existingOvinaType === null ? await farmTypeRepository.save({ name: 'Ovina' }) : existingOvinaType,
+      existingPorcinaType === null ? await farmTypeRepository.save({ name: 'Porcina' }) : existingPorcinaType
     ];
 
     // Verificar y crear tipos de producción
@@ -66,13 +66,13 @@ async function seed() {
     
     // Crear array con tipos existentes o nuevos
     productionTypes = [
-      existingCarnicaType || await productionTypeRepository.save({ name: 'Cárnica' }),
-      existingLacteaType || await productionTypeRepository.save({ name: 'Láctea' })
+      existingCarnicaType === null ? await productionTypeRepository.save({ name: 'Cárnica' }) : existingCarnicaType,
+      existingLacteaType === null ? await productionTypeRepository.save({ name: 'Láctea' }) : existingLacteaType
     ];
 
     // Creamos usuario administrador
     const hashedPassword = await bcrypt.hash('admin123', 10);
-    const admin = await dataSource.getRepository(User).save({
+    await dataSource.getRepository(User).save({
       email: 'admin@minifarm.com',
       password_hash: hashedPassword,
       role: 'admin'

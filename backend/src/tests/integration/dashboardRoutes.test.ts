@@ -128,16 +128,15 @@ describe('Dashboard Routes', () => {
       
       // Configurar mock para find con diferentes parámetros
       mockAnimalFind.mockImplementation((params: any) => {
-        if (params && params.where && Array.isArray(params.where) && params.where.length > 0) {
-          // Verificar si estamos buscando animales de granjas cárnicas o lácteas
-          const farmId = params.where[0].farm.id;
-          if (farmId === 1) { // Granja cárnica
+        const hasValidWhereClause = params?.where && Array.isArray(params.where) && params.where.length > 0;
+        if (hasValidWhereClause) {
+          const farmId = params.where[0]?.farm?.id;
+          if (farmId === 1) {
             return Promise.resolve(mockCarneAnimals);
-          } else if (farmId === 2) { // Granja láctea
+          } else if (farmId === 2) {
             return Promise.resolve(mockLecheAnimals);
           }
-        } else if (params && params.where && params.where.incidents) {
-          // Estamos buscando animales con incidencias
+        } else if (params?.where?.incidents) {
           return Promise.resolve(mockAnimalsWithIncidents);
         }
         return Promise.resolve([]);

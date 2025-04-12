@@ -16,8 +16,12 @@ export const ErrorMessage = ({ error }: ErrorMessageProps) => {
           {error.message}
           {Array.isArray(error.details) && (
             <Box component="ul" sx={{ mt: 1, mb: 0, pl: 2 }}>
-              {error.details.map((detail, index) => (
-                <Typography component="li" key={index} variant="body2">
+              {error.details.map((detail) => (
+                <Typography 
+                  component="li" 
+                  key={`${detail.field}-${detail.message}`} 
+                  variant="body2"
+                >
                   {detail.field}: {detail.message}
                 </Typography>
               ))}

@@ -9,8 +9,10 @@ const Register = () => {
       const { confirmPassword, ...credentials } = values;
       await register(credentials);
     } catch (err) {
-      // El error ya es manejado por el AuthContext
-      throw err; // Propagamos el error para que useFormHandling lo maneje
+      // Los errores son manejados en dos niveles:
+      // 1. AuthContext: maneja el estado de error y muestra mensajes
+      // 2. useFormHandling: maneja errores de formulario
+      throw err;
     }
   };
 

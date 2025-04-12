@@ -86,6 +86,46 @@ export const getFarmById = async (req: Request, res: Response) => {
   }
 };
 
+const handleImageUpdate = async (farm: Farm, file: Express.Multer.File | undefined) => {
+  if (!file) return;
+  
+  if (farm.image_path) {
+    const oldImagePath = path.join(process.cwd(), farm.image_path.replace(/^\//, ''));
+    if (fs.existsSync(oldImagePath)) {
+      fs.unlinkSync(oldImagePath);
+    }
+  }
+  farm.image_path = `/uploads/farms/${file.filename}`;
+};
+
+const validateAndUpdateFarmType = async (farm: Farm, farmTypeId: number | undefined, file?: Express.Multer.File) => {
+  if (!farmTypeId) return true;
+  
+  const farmType = await farmTypeRepository.findOne({ where: { id: farmTypeId } });
+  if (!farmType) {
+    if (file) {
+      fs.unlinkSync(file.path);
+    }
+    return false;
+  }
+  farm.farm_type = farmType;
+  return true;
+};
+
+const validateAndUpdateProductionType = async (farm: Farm, productionTypeId: number | undefined, file?: Express.Multer.File) => {
+  if (!productionTypeId) return true;
+  
+  const productionType = await productionTypeRepository.findOne({ where: { id: productionTypeId } });
+  if (!productionType) {
+    if (file) {
+      fs.unlinkSync(file.path);
+    }
+    return false;
+  }
+  farm.production_type = productionType;
+  return true;
+};
+
 export const updateFarm = async (req: Request, res: Response) => {
   try {
     const farmId = parseInt(req.params.id, 10);
@@ -95,57 +135,34 @@ export const updateFarm = async (req: Request, res: Response) => {
       where: { id: farmId },
       relations: ['farm_type', 'production_type']
     });
+
     if (!farm) {
-      // Si hay un archivo cargado pero la granja no existe, eliminamos el archivo
       if (req.file) {
         fs.unlinkSync(req.file.path);
       }
       return res.status(404).json({ error: 'Granja no encontrada' });
     }
 
-    if (farm_type_id) {
-      const farmType = await farmTypeRepository.findOne({ where: { id: farm_type_id } });
-      if (!farmType) {
-        // Si hay un archivo cargado pero tipo inválido, eliminamos el archivo
-        if (req.file) {
-          fs.unlinkSync(req.file.path);
-        }
-        return res.status(400).json({ error: 'Tipo de granja no válido' });
-      }
-      farm.farm_type = farmType;
+    // Validar y actualizar tipo de granja
+    const isValidFarmType = await validateAndUpdateFarmType(farm, farm_type_id, req.file);
+    if (!isValidFarmType) {
+      return res.status(400).json({ error: 'Tipo de granja no válido' });
     }
 
-    if (production_type_id) {
-      const productionType = await productionTypeRepository.findOne({ where: { id: production_type_id } });
-      if (!productionType) {
-        // Si hay un archivo cargado pero tipo inválido, eliminamos el archivo
-        if (req.file) {
-          fs.unlinkSync(req.file.path);
-        }
-        return res.status(400).json({ error: 'Tipo de producción no válido' });
-      }
-      farm.production_type = productionType;
+    // Validar y actualizar tipo de producción
+    const isValidProductionType = await validateAndUpdateProductionType(farm, production_type_id, req.file);
+    if (!isValidProductionType) {
+      return res.status(400).json({ error: 'Tipo de producción no válido' });
     }
 
-    // Si se cargó una nueva imagen
-    if (req.file) {
-      // Si la granja ya tenía una imagen, eliminarla
-      if (farm.image_path) {
-        const oldImagePath = path.join(process.cwd(), farm.image_path.replace(/^\//, ''));
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
-      // Actualizar con la nueva ruta de imagen
-      farm.image_path = `/uploads/farms/${req.file.filename}`;
-    }
+    // Manejar actualización de imagen
+    await handleImageUpdate(farm, req.file);
 
     farm.name = name ?? farm.name;
 
     const updatedFarm = await farmRepository.save(farm);
     return res.json({ message: 'Granja actualizada', farm: updatedFarm });
   } catch (error) {
-    // Si hay un archivo cargado pero ocurre un error, eliminamos el archivo
     if (req.file) {
       fs.unlinkSync(req.file.path);
     }

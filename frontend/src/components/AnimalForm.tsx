@@ -53,7 +53,7 @@ const AnimalForm = memo(({
   
   // Valores iniciales por defecto
   const defaultValues: AnimalFormValues = {
-    farm_id: farmId || 0,
+    farm_id: farmId === undefined ? 0 : farmId,
     animal_type: animalType,
     identification_number: '',
     weight: 0,
