@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
 
     // Desactiva la que te da el error al no inicializar propiedades:
     "strictPropertyInitialization": false

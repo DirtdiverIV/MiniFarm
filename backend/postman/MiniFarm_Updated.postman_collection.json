@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
-		"name": "MiniFarm API",
-		"description": "API para la gestión de granjas y animales",
+		"name": "MiniFarm API (Actualizada)",
+		"description": "API para la gestión de granjas y animales (con soporte para subida de imágenes)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -156,7 +156,7 @@
 					}
 				},
 				{
-					"name": "Crear Granja",
+					"name": "Crear Granja (JSON)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -171,7 +171,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Granja Ejemplo\",\n    \"farm_type_id\": 1,\n    \"production_type_id\": 1,\n    \"image_path\": null\n}"
+							"raw": "{\n    \"name\": \"Granja Ejemplo\",\n    \"farm_type_id\": 1,\n    \"production_type_id\": 1\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/farms",
@@ -181,7 +181,49 @@
 					}
 				},
 				{
-					"name": "Actualizar Granja",
+					"name": "Crear Granja con Imagen (FormData)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Granja Ejemplo",
+									"type": "text"
+								},
+								{
+									"key": "farm_type_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "production_type_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/path/to/image.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/farms",
+							"host": ["{{base_url}}"],
+							"path": ["api", "farms"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Granja (JSON)",
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -197,6 +239,54 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"name\": \"Granja Actualizada\",\n    \"farm_type_id\": 2,\n    \"production_type_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/farms/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "farms", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Granja con Imagen (FormData)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Granja Actualizada",
+									"type": "text"
+								},
+								{
+									"key": "farm_type_id",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "production_type_id",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/path/to/updated-image.jpg"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/farms/:id",
@@ -274,7 +364,7 @@
 					}
 				},
 				{
-					"name": "Crear Animal",
+					"name": "Crear Animal (JSON)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -299,7 +389,69 @@
 					}
 				},
 				{
-					"name": "Actualizar Animal",
+					"name": "Crear Animal con Imagen (FormData)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "animal_type",
+									"value": "Vaca",
+									"type": "text"
+								},
+								{
+									"key": "identification_number",
+									"value": "VAC001",
+									"type": "text"
+								},
+								{
+									"key": "weight",
+									"value": "500",
+									"type": "text"
+								},
+								{
+									"key": "estimated_production",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "sanitary_register",
+									"value": "SR001",
+									"type": "text"
+								},
+								{
+									"key": "age",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "farm_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/path/to/animal-image.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/animals",
+							"host": ["{{base_url}}"],
+							"path": ["api", "animals"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Animal (JSON)",
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -315,6 +467,54 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"weight\": 550,\n    \"estimated_production\": 25,\n    \"age\": 4\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/animals/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "animals", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Animal con Imagen (FormData)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "weight",
+									"value": "550",
+									"type": "text"
+								},
+								{
+									"key": "estimated_production",
+									"value": "25",
+									"type": "text"
+								},
+								{
+									"key": "age",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/path/to/updated-animal-image.jpg"
+								}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/animals/:id",
@@ -392,6 +592,33 @@
 							"raw": "{{base_url}}/api/dashboard/stats",
 							"host": ["{{base_url}}"],
 							"path": ["api", "dashboard", "stats"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Imágenes",
+			"item": [
+				{
+					"name": "Obtener Imagen de Granja",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/uploads/farms/farm-[nombre-archivo].jpg",
+							"host": ["{{base_url}}"],
+							"path": ["uploads", "farms", "farm-[nombre-archivo].jpg"]
+						}
+					}
+				},
+				{
+					"name": "Obtener Imagen de Animal",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/uploads/animals/animal-[nombre-archivo].jpg",
+							"host": ["{{base_url}}"],
+							"path": ["uploads", "animals", "animal-[nombre-archivo].jpg"]
 						}
 					}
 				}

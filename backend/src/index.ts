@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 dotenv.config();
 
 import { AppDataSource } from './config/dataSource';
@@ -15,6 +16,9 @@ import dashboardRouter from './routes/dashboardRoutes';
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Configurar para servir archivos estáticos desde la carpeta uploads
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use('/api/users', userRouter);
 app.use('/api/farms', farmRouter);
