@@ -12,6 +12,8 @@ import { farmRouter } from './routes/farmRoutes';
 import { animalRouter } from './routes/animalRoutes';
 import { typeRouter } from './routes/typeRoutes';
 import dashboardRouter from './routes/dashboardRoutes';
+import { farmTypeRouter } from './routes/farmTypeRoutes';
+import { productionTypeRouter } from './routes/productionTypeRoutes';
 
 const app = express();
 app.use(cors());
@@ -25,6 +27,8 @@ app.use('/api/farms', farmRouter);
 app.use('/api/animals', animalRouter);
 app.use('/api/types', typeRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/farm-types', farmTypeRouter);
+app.use('/api/production-types', productionTypeRouter);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('API MiniFarm con TypeORM funcionando correctamente!');
