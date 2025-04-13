@@ -86,18 +86,24 @@ async function seed() {
     farm1.production_type = productionTypes[0];
     // La ruta de la imagen debe comenzar con /uploads/farms/
     farm1.image_path = '/uploads/farms/farm-bovine-example.jpg';
+    farm1.provincia = 'Sevilla';
+    farm1.municipio = 'Dos Hermanas';
 
     const farm2 = new Farm();
     farm2.name = 'Granja Ovina Láctea';
     farm2.farm_type = farmTypes[1];
     farm2.production_type = productionTypes[1];
     farm2.image_path = '/uploads/farms/farm-sheep-example.jpg';
+    farm2.provincia = 'Córdoba';
+    farm2.municipio = 'Pozoblanco';
 
     const farm3 = new Farm();
     farm3.name = 'Granja Porcina Cárnica';
     farm3.farm_type = farmTypes[2];
     farm3.production_type = productionTypes[0];
     farm3.image_path = '/uploads/farms/farm-pig-example.jpg';
+    farm3.provincia = 'Huelva';
+    farm3.municipio = 'Jabugo';
 
     const farms = await farmRepository.save([farm1, farm2, farm3]);
 

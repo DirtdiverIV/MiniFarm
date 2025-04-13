@@ -3,7 +3,7 @@ import { AppDataSource } from '../config/dataSource';
 import { Animal } from '../models/Animal';
 import { Farm } from '../models/Farm';
 import { ProductionType } from '../models/ProductionType';
-import { Not, IsNull } from 'typeorm';
+import { Not, IsNull, Not as TypeOrmNot, And } from 'typeorm';
 
 const animalRepository = AppDataSource.getRepository(Animal);
 const farmRepository = AppDataSource.getRepository(Farm);
@@ -30,7 +30,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       where: carneFarms.map(farm => ({ farm: { id: farm.id } }))
     });
     const totalCarneProduction = carneAnimals.reduce((sum, animal) => 
-      sum + (animal.estimated_production === undefined ? 0 : animal.estimated_production), 0);
+      sum + (animal.estimated_production ?? 0), 0);
 
     // Calcular producción estimada de leche
     const lecheFarms = farms.filter(farm => farm.production_type?.id === lecheType?.id);
@@ -38,11 +38,13 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       where: lecheFarms.map(farm => ({ farm: { id: farm.id } }))
     });
     const totalLecheProduction = lecheAnimals.reduce((sum, animal) => 
-      sum + (animal.estimated_production === undefined ? 0 : animal.estimated_production), 0);
+      sum + (animal.estimated_production ?? 0), 0);
 
     // Obtener animales con incidencias
     const animalsWithIncidents = await animalRepository.find({
-      where: { incidents: Not(IsNull()) },
+      where: {
+        incidents: Not(IsNull())
+      },
       relations: ['farm']
     });
 

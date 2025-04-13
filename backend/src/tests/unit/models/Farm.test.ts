@@ -43,6 +43,22 @@ describe('Farm Model', () => {
     // Establecer null
     farm.image_path = null;
     expect(farm.image_path).toBeNull();
+    
+    // provincia y municipio son opcionales (pueden ser null)
+    expect(farm.provincia).toBeUndefined();
+    expect(farm.municipio).toBeUndefined();
+    
+    // Establecer valores
+    farm.provincia = 'Córdoba';
+    farm.municipio = 'Lucena';
+    expect(farm.provincia).toBe('Córdoba');
+    expect(farm.municipio).toBe('Lucena');
+    
+    // Establecer null
+    farm.provincia = null;
+    farm.municipio = null;
+    expect(farm.provincia).toBeNull();
+    expect(farm.municipio).toBeNull();
   });
 
   it('debería tener fechas de creación y actualización', () => {
@@ -76,7 +92,9 @@ describe('Farm Model', () => {
       name: 'Granja El Rancho',
       farm_type: farmType,
       production_type: productionType,
-      image_path: '/imagenes/rancho.jpg'
+      image_path: '/imagenes/rancho.jpg',
+      provincia: 'Sevilla',
+      municipio: 'Carmona'
     });
     
     expect(farm).toBeInstanceOf(Farm);
@@ -85,6 +103,8 @@ describe('Farm Model', () => {
     expect(farm.farm_type).toBe(farmType);
     expect(farm.production_type).toBe(productionType);
     expect(farm.image_path).toBe('/imagenes/rancho.jpg');
+    expect(farm.provincia).toBe('Sevilla');
+    expect(farm.municipio).toBe('Carmona');
   });
   
   it('debería crear una granja con valores opcionales nulos usando el método estático create', () => {
@@ -98,5 +118,7 @@ describe('Farm Model', () => {
     expect(farm.farm_type).toBeUndefined();
     expect(farm.production_type).toBeUndefined();
     expect(farm.image_path).toBeNull();
+    expect(farm.provincia).toBeNull();
+    expect(farm.municipio).toBeNull();
   });
 }); 

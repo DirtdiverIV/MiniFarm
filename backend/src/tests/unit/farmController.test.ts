@@ -102,7 +102,9 @@ describe('Farm Controller', () => {
       mockRequest.body = {
         name: 'Granja Test',
         farm_type_id: 1,
-        production_type_id: 1
+        production_type_id: 1,
+        provincia: 'Málaga',
+        municipio: 'Antequera'
       };
 
       const mockFarmType = { id: 1, name: 'Tipo Test' };
@@ -111,7 +113,9 @@ describe('Farm Controller', () => {
         id: 1,
         name: 'Granja Test',
         farm_type: mockFarmType,
-        production_type: mockProductionType
+        production_type: mockProductionType,
+        provincia: 'Málaga',
+        municipio: 'Antequera'
       };
 
       // Configurar mocks
@@ -236,26 +240,43 @@ describe('Farm Controller', () => {
   });
 
   describe('updateFarm', () => {
-    test('debería actualizar una granja correctamente', async () => {
+    test('debería actualizar una granja exitosamente', async () => {
       // Preparar datos de prueba
       mockRequest.params = { id: '1' };
-      mockRequest.body = { name: 'Granja Actualizada' };
-      
-      const mockFarm = {
-        id: 1,
-        name: 'Granja Original',
-        farm_type: { id: 1 },
-        production_type: { id: 1 }
+      mockRequest.body = {
+        name: 'Granja Actualizada',
+        farm_type_id: 2,
+        production_type_id: 2,
+        provincia: 'Cádiz',
+        municipio: 'Jerez'
       };
 
-      const mockUpdatedFarm = {
-        ...mockFarm,
-        name: 'Granja Actualizada'
+      const mockFarmType = { id: 2, name: 'Tipo Actualizado' };
+      const mockProductionType = { id: 2, name: 'Producción Actualizada' };
+      
+      const existingFarm = {
+        id: 1,
+        name: 'Granja Test',
+        farm_type: { id: 1, name: 'Tipo Original' },
+        production_type: { id: 1, name: 'Producción Original' },
+        provincia: 'Málaga',
+        municipio: 'Antequera'
+      };
+      
+      const updatedFarm = {
+        ...existingFarm,
+        name: 'Granja Actualizada',
+        farm_type: mockFarmType,
+        production_type: mockProductionType,
+        provincia: 'Cádiz',
+        municipio: 'Jerez'
       };
 
       // Configurar mocks
-      mockFarmRepository.findOne.mockResolvedValue(mockFarm);
-      mockFarmRepository.save.mockResolvedValue(mockUpdatedFarm);
+      mockFarmRepository.findOne.mockResolvedValue(existingFarm);
+      mockFarmTypeRepository.findOne.mockResolvedValue(mockFarmType);
+      mockProductionTypeRepository.findOne.mockResolvedValue(mockProductionType);
+      mockFarmRepository.save.mockResolvedValue(updatedFarm);
 
       // Ejecutar el controlador
       await farmController.updateFarm(mockRequest as Request, mockResponse as Response);
@@ -263,8 +284,16 @@ describe('Farm Controller', () => {
       // Verificar resultados
       expect(mockResponse.json).toHaveBeenCalledWith({
         message: 'Granja actualizada',
-        farm: mockUpdatedFarm
+        farm: updatedFarm
       });
+      
+      // Verificar que los nuevos campos se actualizaron
+      expect(mockFarmRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          provincia: 'Cádiz',
+          municipio: 'Jerez'
+        })
+      );
     });
 
     test('debería devolver 404 si la granja a actualizar no existe', async () => {

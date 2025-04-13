@@ -190,7 +190,9 @@ describe('Farm Routes', () => {
         id: 1,
         name: 'Granja Test',
         farm_type: mockFarmType,
-        production_type: mockProductionType
+        production_type: mockProductionType,
+        provincia: 'Sevilla',
+        municipio: 'Écija'
       };
 
       mockFarmTypeFind.mockResolvedValue(mockFarmType);
@@ -203,16 +205,21 @@ describe('Farm Routes', () => {
         .send({
           name: 'Granja Test',
           farm_type_id: 1,
-          production_type_id: 1
+          production_type_id: 1,
+          provincia: 'Sevilla',
+          municipio: 'Écija'
         });
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('message', 'Granja creada');
-      expect(response.body).toHaveProperty('farm');
-      expect(mockFarmTypeFind).toHaveBeenCalledWith({ where: { id: 1 } });
-      expect(mockProductionTypeFind).toHaveBeenCalledWith({ where: { id: 1 } });
-      expect(mockCreate).toHaveBeenCalled();
-      expect(mockSave).toHaveBeenCalled();
+      expect(response.body).toHaveProperty('farm', mockFarm);
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Granja Test',
+          provincia: 'Sevilla',
+          municipio: 'Écija'
+        })
+      );
     });
 
     test('debería manejar la carga de imágenes', async () => {
@@ -260,31 +267,52 @@ describe('Farm Routes', () => {
 
   describe('PUT /api/farms/:id', () => {
     test('debería actualizar una granja correctamente', async () => {
-      const mockFarm = {
+      const mockFarmType = { id: 2, name: 'Tipo Actualizado' };
+      const mockProductionType = { id: 2, name: 'Producción Actualizada' };
+      
+      const existingFarm = {
         id: 1,
         name: 'Granja Original',
-        farm_type: { id: 1 },
-        production_type: { id: 1 }
+        farm_type: { id: 1, name: 'Tipo Original' },
+        production_type: { id: 1, name: 'Producción Original' },
+        provincia: 'Córdoba',
+        municipio: 'Montilla'
+      };
+      
+      const updatedFarm = {
+        ...existingFarm,
+        name: 'Granja Actualizada',
+        farm_type: mockFarmType,
+        production_type: mockProductionType,
+        provincia: 'Jaén',
+        municipio: 'Úbeda'
       };
 
-      const mockUpdatedFarm = {
-        ...mockFarm,
-        name: 'Granja Actualizada'
-      };
-
-      mockFindOne.mockResolvedValue(mockFarm);
-      mockSave.mockResolvedValue(mockUpdatedFarm);
+      mockFindOne.mockResolvedValue(existingFarm);
+      mockFarmTypeFind.mockResolvedValue(mockFarmType);
+      mockProductionTypeFind.mockResolvedValue(mockProductionType);
+      mockSave.mockResolvedValue(updatedFarm);
 
       const response = await request(app)
         .put('/api/farms/1')
         .send({
-          name: 'Granja Actualizada'
+          name: 'Granja Actualizada',
+          farm_type_id: 2,
+          production_type_id: 2,
+          provincia: 'Jaén',
+          municipio: 'Úbeda'
         });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message', 'Granja actualizada');
-      expect(response.body).toHaveProperty('farm');
-      expect(mockSave).toHaveBeenCalled();
+      expect(response.body).toHaveProperty('farm', updatedFarm);
+      expect(mockSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Granja Actualizada',
+          provincia: 'Jaén',
+          municipio: 'Úbeda'
+        })
+      );
     });
 
     test('debería devolver 404 si la granja no existe', async () => {

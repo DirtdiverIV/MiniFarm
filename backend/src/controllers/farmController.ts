@@ -14,7 +14,7 @@ const animalRepository = AppDataSource.getRepository(Animal);
 
 export const createFarm = async (req: Request, res: Response) => {
   try {
-    const { name, farm_type_id, production_type_id } = req.body;
+    const { name, farm_type_id, production_type_id, provincia, municipio } = req.body;
 
     if (!name || !farm_type_id || !production_type_id) {
       // Si hay un archivo cargado pero faltan datos, eliminamos el archivo
@@ -42,7 +42,9 @@ export const createFarm = async (req: Request, res: Response) => {
       name,
       farm_type: farmType,
       production_type: productionType,
-      image_path
+      image_path,
+      provincia,
+      municipio
     });
 
     const savedFarm = await farmRepository.save(newFarm);
@@ -129,7 +131,7 @@ const validateAndUpdateProductionType = async (farm: Farm, productionTypeId: num
 export const updateFarm = async (req: Request, res: Response) => {
   try {
     const farmId = parseInt(req.params.id, 10);
-    const { name, farm_type_id, production_type_id } = req.body;
+    const { name, farm_type_id, production_type_id, provincia, municipio } = req.body;
 
     const farm = await farmRepository.findOne({
       where: { id: farmId },
@@ -159,6 +161,8 @@ export const updateFarm = async (req: Request, res: Response) => {
     await handleImageUpdate(farm, req.file);
 
     farm.name = name ?? farm.name;
+    farm.provincia = provincia !== undefined ? provincia : farm.provincia;
+    farm.municipio = municipio !== undefined ? municipio : farm.municipio;
 
     const updatedFarm = await farmRepository.save(farm);
     return res.json({ message: 'Granja actualizada', farm: updatedFarm });
