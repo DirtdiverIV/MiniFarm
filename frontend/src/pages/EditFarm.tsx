@@ -105,6 +105,12 @@ const EditFarm = () => {
           startIcon={<ArrowBackIcon />}
           onClick={handleCancel}
           disabled={updateFarmApi.loading}
+          sx={{
+            color: 'text.secondary',
+            '&:hover': {
+              backgroundColor: 'action.hover',
+            }
+          }}
         >
           Volver
         </Button>

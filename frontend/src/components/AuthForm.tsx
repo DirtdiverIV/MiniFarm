@@ -12,6 +12,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Form, Formik, Field } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
+import { alpha } from '@mui/material/styles';
+import { Agriculture as AgricultureIcon } from '@mui/icons-material';
+import { themeColors } from '../theme/theme';
 
 interface AuthFormValues {
   email: string;
@@ -71,6 +74,37 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
           alignItems: 'center'
         }}
       >
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          flexDirection: 'column',
+          mb: 3
+        }}>
+          <AgricultureIcon 
+            sx={{
+              fontSize: 60,
+              color: themeColors.primary.main,
+              transition: 'transform 0.2s',
+              '&:hover': {
+                transform: 'scale(1.05)'
+              },
+              textShadow: `2px 2px 4px ${alpha(themeColors.common.black, 0.2)}`,
+              mb: 1
+            }}
+          />
+          <Typography 
+            variant="h4" 
+            sx={{
+              fontWeight: 700,
+              letterSpacing: '0.5px',
+              textShadow: `1px 1px 2px ${alpha(themeColors.common.black, 0.1)}`,
+              color: themeColors.primary.main
+            }}
+          >
+            MiniFarm
+          </Typography>
+        </Box>
+        
         <Typography component="h1" variant="h5">
           {isLogin ? 'Iniciar Sesión' : 'Registrarse'}
         </Typography>

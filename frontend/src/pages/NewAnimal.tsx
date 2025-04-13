@@ -78,13 +78,14 @@ const NewAnimal = () => {
           }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Button 
-                variant="outlined"
                 startIcon={<ArrowBackIcon />} 
                 onClick={handleBack}
-                sx={(theme) => ({
-                  borderRadius: theme.shape.borderRadius * 6,
-                  px: 3,
-                })}
+                sx={{
+                  color: 'text.secondary',
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                  }
+                }}
               >
                 Volver
               </Button>

@@ -150,7 +150,12 @@ const EditAnimal = () => {
           <Button 
             startIcon={<ArrowBackIcon />} 
             onClick={handleBack}
-            sx={{ mr: 2 }}
+            sx={{
+              color: 'text.secondary',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              }
+            }}
           >
             Volver
           </Button>

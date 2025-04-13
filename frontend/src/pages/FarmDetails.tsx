@@ -166,6 +166,10 @@ const FarmDetails = () => {
   const averageWeight = animals.length > 0 
     ? animals.reduce((sum, animal) => sum + animal.weight, 0) / animals.length 
     : 0;
+  
+  // Determinar la unidad de producción según el tipo de producción de la granja
+  const isLecheProduction = farm?.production_type?.name?.toLowerCase().includes('leche');
+  const productionUnit = isLecheProduction ? 'litros/semana' : 'kg total estimado';
 
   if (!farm) {
     return null;
@@ -312,6 +316,7 @@ const FarmDetails = () => {
             title="Peso Promedio"
             value={Math.round(averageWeight)}
             icon={<ScaleIcon />}
+            unit="kg"
             sx={(theme) => ({
               backgroundColor: alpha(themeColors.secondary.light, 0.2),
               border: '1px solid',
@@ -322,6 +327,7 @@ const FarmDetails = () => {
             title="Producción Total"
             value={totalProduction}
             icon={<PetsIcon />}
+            unit={productionUnit}
             sx={(theme) => ({
               backgroundColor: alpha(themeColors.primary.light, 0.2),
               border: '1px solid',

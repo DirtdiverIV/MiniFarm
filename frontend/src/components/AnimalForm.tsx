@@ -10,11 +10,16 @@ import {
   Divider,
   Stack,
   IconButton,
-  Tooltip
+  Tooltip,
+  FormControl,
+  MenuItem,
+  Paper
 } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import { ErrorMessage } from './ErrorMessage';
 import { Info as InfoIcon } from '@mui/icons-material';
+import { useParams } from 'react-router-dom';
+import { useApi } from '../hooks/useApi';
 
 // Importar servicios y tipos
 import { getFarmById } from '../services/farmService';
@@ -54,6 +59,43 @@ const AnimalForm = memo(({
   farmId 
 }: AnimalFormProps) => {
   const [animalType, setAnimalType] = useState<string>('');
+  const [farmType, setFarmType] = useState<{id: number, name: string}>();
+  const [productionType, setProductionType] = useState<{id: number, name: string}>();
+  const { id } = useParams<{ id: string }>();
+  
+  // Obtener el tipo de producción de la granja
+  const farmApi = useApi(async () => {
+    if (!farmId && !id) return {
+      success: false, 
+      data: null, 
+      message: 'ID de granja no disponible'
+    };
+    
+    const farmData = await getFarmById(parseInt(farmId?.toString() || id || '0'));
+    return {
+      success: true,
+      data: farmData,
+      message: 'Datos de la granja cargados'
+    };
+  });
+  
+  useEffect(() => {
+    if (farmId || id) {
+      farmApi.execute();
+    }
+  }, [farmId, id]);
+  
+  useEffect(() => {
+    if (farmApi.data) {
+      setFarmType(farmApi.data.farm_type);
+      setProductionType(farmApi.data.production_type);
+    }
+  }, [farmApi.data]);
+  
+  // Determinar si es producción láctea
+  const isLecheProduction = productionType?.name?.toLowerCase().includes('leche');
+  const productionLabel = isLecheProduction ? 'Producción Láctea Estimada' : 'Producción Cárnica Estimada';
+  const productionUnit = isLecheProduction ? 'litros/semana' : 'kg total';
   
   // Valores iniciales por defecto
   const defaultValues: AnimalFormValues = {
@@ -244,9 +286,12 @@ const AnimalForm = memo(({
                       <Field
                         as={TextField}
                         name="estimated_production"
-                        label="Producción Estimada"
+                        label={productionLabel}
                         type="number"
                         fullWidth
+                        InputProps={{
+                          endAdornment: <InputAdornment position="end">{productionUnit}</InputAdornment>,
+                        }}
                         error={touched.estimated_production && !!errors.estimated_production}
                         helperText={touched.estimated_production && errors.estimated_production}
                       />

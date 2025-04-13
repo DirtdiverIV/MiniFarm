@@ -4,7 +4,6 @@ import {
   Typography, 
   Container,
   Button,
-  IconButton
 } from '@mui/material';
 import { 
   Add as AddIcon,
@@ -13,11 +12,9 @@ import {
   WaterDrop as WaterDropIcon,
   LocalShipping as MeatIcon,
   Warning as WarningIcon,
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon
+
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { alpha } from '@mui/material/styles';
 import { themeColors } from '../theme/theme';
 import { commonStyles } from '../theme/commonStyles';
 
@@ -37,7 +34,7 @@ import { useAlert } from '../hooks/useAlert';
 import { useAnimalData } from '../hooks/useAnimalData';
 
 // Servicios
-import { getDashboardStats, DashboardStats, AnimalWithIncident } from '../services/dashboardService';
+import { getDashboardStats, DashboardStats } from '../services/dashboardService';
 import { getAllFarms, Farm, deleteFarm } from '../services/farmService';
 
 const Dashboard = () => {
@@ -134,30 +131,7 @@ const Dashboard = () => {
   const [currentFarmPage, setCurrentFarmPage] = useState(0);
   const farmsPerPage = 3;
 
-  const handleNextPage = () => {
-    if (farmsApi.data) {
-      setCurrentFarmPage(prev => 
-        prev + 1 >= Math.ceil((farmsApi.data?.length || 0) / farmsPerPage) ? 0 : prev + 1
-      );
-    }
-  };
 
-  const handlePrevPage = () => {
-    if (farmsApi.data) {
-      setCurrentFarmPage(prev => 
-        prev - 1 < 0 ? Math.ceil((farmsApi.data?.length || 0) / farmsPerPage) - 1 : prev - 1
-      );
-    }
-  };
-
-  // Calcular granjas visibles
-  const visibleFarms = farmsApi.data ? farmsApi.data.slice(
-    currentFarmPage * farmsPerPage,
-    (currentFarmPage + 1) * farmsPerPage
-  ) : [];
-
-  const totalPages = farmsApi.data ? Math.ceil(farmsApi.data.length / farmsPerPage) : 0;
-  const showNavigation = (farmsApi.data?.length || 0) > farmsPerPage;
 
   // Usar el hook personalizado para obtener los animales convertidos
   const animalsWithIncidences = useAnimalData(dashboardApi.data?.animals_with_incidents || null);
@@ -222,6 +196,7 @@ const Dashboard = () => {
             title="Producción Cárnica"
             value={dashboardApi.data?.total_carne_production ?? 0}
             icon={<MeatIcon />}
+            unit="kgs est."
             sx={() => ({ 
               ...commonStyles.cards.base,
               ...commonStyles.cards.primary
@@ -231,6 +206,7 @@ const Dashboard = () => {
             title="Producción Láctea"
             value={dashboardApi.data?.total_leche_production ?? 0}
             icon={<WaterDropIcon />}
+            unit="litros/semana"
             sx={() => ({ 
               ...commonStyles.cards.base,
               ...commonStyles.cards.tertiary

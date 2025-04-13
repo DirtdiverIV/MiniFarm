@@ -6,10 +6,11 @@ interface StatCardProps {
   value: number;
   icon: ReactNode;
   color?: 'default' | 'primary' | 'error';
+  unit?: string;
   sx?: SxProps<Theme>;
 }
 
-const StatCard = ({ title, value, icon, color = 'default', sx }: StatCardProps) => {
+const StatCard = ({ title, value, icon, color = 'default', unit, sx }: StatCardProps) => {
   return (
     <Paper
       elevation={0}
@@ -61,17 +62,32 @@ const StatCard = ({ title, value, icon, color = 'default', sx }: StatCardProps) 
           {icon}
         </Box>
       </Box>
-      <Typography 
-        variant="h4" 
-        component="div"
-        sx={(theme) => ({
-          fontWeight: 700,
-          color: color === 'default' ? theme.palette.text.primary : theme.palette[color || 'primary'].main,
-          lineHeight: 1
-        })}
-      >
-        {value}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
+        <Typography 
+          variant="h4" 
+          component="div"
+          sx={(theme) => ({
+            fontWeight: 700,
+            color: color === 'default' ? theme.palette.text.primary : theme.palette[color || 'primary'].main,
+            lineHeight: 1
+          })}
+        >
+          {value}
+        </Typography>
+        {unit && (
+          <Typography 
+            variant="body2" 
+            component="span" 
+            sx={(theme) => ({ 
+              ml: 1, 
+              color: theme.palette.text.secondary,
+              fontWeight: 500
+            })}
+          >
+            {unit}
+          </Typography>
+        )}
+      </Box>
     </Paper>
   );
 };
