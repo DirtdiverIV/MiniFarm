@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { 
   Box, 
   TextField, 
@@ -8,9 +8,10 @@ import {
   Select,
   MenuItem,
   Typography,
-  Paper
+  Paper,
+  Autocomplete
 } from '@mui/material';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { ErrorMessage } from './ErrorMessage';
 
@@ -30,6 +31,8 @@ export interface FarmFormValues {
   name: string;
   farm_type_id: number;
   production_type_id: number;
+  provincia: string;
+  municipio: string;
   image?: File | null;
 }
 
@@ -45,6 +48,10 @@ const FarmFormSchema = Yup.object().shape({
   production_type_id: Yup.number()
     .required('El tipo de producción es obligatorio')
     .min(1, 'Selecciona un tipo de producción válido'),
+  provincia: Yup.string()
+    .required('La provincia es obligatoria'),
+  municipio: Yup.string()
+    .required('El municipio es obligatorio'),
 });
 
 const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormProps) => {
@@ -53,13 +60,25 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
     name: '',
     farm_type_id: 0,
     production_type_id: 0,
+    provincia: '',
+    municipio: '',
     image: null
   };
 
+  // Estado para el código de provincia seleccionada
+  const [selectedProvinciaCode, setSelectedProvinciaCode] = useState<string | null>(null);
+
   // Hooks personalizados
-  const { farmTypes, productionTypes, loading: typesLoading } = useFormTypes();
+  const { 
+    farmTypes, 
+    productionTypes, 
+    provincias, 
+    municipios, 
+    loading: typesLoading, 
+    setSelectedProvincia
+  } = useFormTypes();
   const { selectedImage, handleImageChange, clearImage } = useImagePreview();
-  const { handleSubmit, error, loading: formLoading } = useFormHandling({
+  const { handleSubmit: originalHandleSubmit, error, loading: formLoading } = useFormHandling({
     onSubmit,
     initialValues: initialValues ?? defaultValues,
     isEditing,
@@ -69,6 +88,27 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
       }
     }
   });
+
+  // Envolver el handleSubmit para depurar los valores
+  const handleSubmit = async (values: FarmFormValues, formikHelpers: FormikHelpers<FarmFormValues>) => {
+    console.log('Valores a enviar:', values);
+    return originalHandleSubmit(values, formikHelpers);
+  };
+
+  // Buscar el código de la provincia cuando se carga un valor inicial
+  useEffect(() => {
+    if (isEditing && initialValues?.provincia && provincias.length > 0) {
+      // Buscar la provincia por nombre (ahora usando label)
+      const provinciaEncontrada = provincias.find(
+        p => p.label.toLowerCase() === initialValues.provincia.toLowerCase()
+      );
+      
+      if (provinciaEncontrada) {
+        setSelectedProvinciaCode(provinciaEncontrada.code);
+        setSelectedProvincia(provinciaEncontrada.code);
+      }
+    }
+  }, [isEditing, initialValues, provincias, setSelectedProvincia]);
 
   return (
     <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
@@ -84,7 +124,7 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
         onSubmit={handleSubmit}
         enableReinitialize
       >
-        {({ isSubmitting, touched, errors, setFieldValue }) => (
+        {({ isSubmitting, touched, errors, setFieldValue, values }) => (
           <Form>
             <Box sx={{ display: 'grid', gridGap: '16px', gridTemplateColumns: '1fr', width: '100%' }}>
               <Box>
@@ -149,6 +189,66 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
                     </Typography>
                   )}
                 </FormControl>
+              </Box>
+
+              <Box sx={{ 
+                display: 'grid', 
+                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, 
+                gap: 2 
+              }}>
+                <Autocomplete
+                  options={provincias}
+                  getOptionLabel={(option) => option.label}
+                  value={provincias.find(p => p.label === values.provincia) || null}
+                  onChange={(_, newValue) => {
+                    console.log('Nueva provincia seleccionada:', newValue);
+                    if (newValue) {
+                      setFieldValue('provincia', newValue.label);
+                      setSelectedProvinciaCode(newValue.code);
+                      setSelectedProvincia(newValue.code);
+                      // Limpiar municipio cuando cambia la provincia
+                      setFieldValue('municipio', '');
+                    } else {
+                      setFieldValue('provincia', '');
+                      setSelectedProvinciaCode(null);
+                      setSelectedProvincia('');
+                      setFieldValue('municipio', '');
+                    }
+                  }}
+                  renderInput={(params) => 
+                    <TextField 
+                      {...params} 
+                      label="Provincia" 
+                      margin="normal"
+                      error={touched.provincia && !!errors.provincia}
+                      helperText={touched.provincia && errors.provincia}
+                    />
+                  }
+                />
+                
+                <Autocomplete
+                  options={municipios}
+                  getOptionLabel={(option) => option.label}
+                  value={municipios.find(m => m.label === values.municipio) || null}
+                  disabled={!selectedProvinciaCode}
+                  onChange={(_, newValue) => {
+                    console.log('Nuevo municipio seleccionado:', newValue);
+                    if (newValue) {
+                      setFieldValue('municipio', newValue.label);
+                    } else {
+                      setFieldValue('municipio', '');
+                    }
+                  }}
+                  renderInput={(params) => 
+                    <TextField 
+                      {...params} 
+                      label="Municipio" 
+                      margin="normal"
+                      error={touched.municipio && !!errors.municipio}
+                      helperText={touched.municipio && errors.municipio}
+                    />
+                  }
+                />
               </Box>
               
               <Box sx={{ mt: 2 }}>

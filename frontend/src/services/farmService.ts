@@ -12,6 +12,8 @@ export interface Farm {
     id: number;
     name: string;
   };
+  provincia: string;
+  municipio: string;
   image_path: string;
 }
 
@@ -19,6 +21,8 @@ export interface FarmCreateData {
   name: string;
   farm_type_id: number;
   production_type_id: number;
+  provincia: string;
+  municipio: string;
   image?: File;
 }
 
@@ -26,6 +30,8 @@ export interface FarmUpdateData {
   name?: string;
   farm_type_id?: number;
   production_type_id?: number;
+  provincia?: string;
+  municipio?: string;
   image?: File;
 }
 
@@ -48,6 +54,8 @@ export const createFarm = async (farmData: FarmCreateData): Promise<Farm> => {
   formData.append('name', farmData.name);
   formData.append('farm_type_id', farmData.farm_type_id.toString());
   formData.append('production_type_id', farmData.production_type_id.toString());
+  formData.append('provincia', farmData.provincia);
+  formData.append('municipio', farmData.municipio);
   
   if (farmData.image) {
     formData.append('image', farmData.image);
@@ -77,6 +85,14 @@ export const updateFarm = async (id: number, farmData: FarmUpdateData): Promise<
   
   if (farmData.production_type_id) {
     formData.append('production_type_id', farmData.production_type_id.toString());
+  }
+  
+  if (farmData.provincia) {
+    formData.append('provincia', farmData.provincia);
+  }
+  
+  if (farmData.municipio) {
+    formData.append('municipio', farmData.municipio);
   }
   
   if (farmData.image) {

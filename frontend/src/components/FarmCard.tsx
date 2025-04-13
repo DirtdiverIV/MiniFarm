@@ -15,7 +15,8 @@ import {
   Visibility as VisibilityIcon,
   Delete as DeleteIcon,
   Agriculture as AgricultureIcon,
-  LocalShipping as ShippingIcon
+  LocalShipping as ShippingIcon,
+  LocationOn as LocationIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { Farm } from '../services/farmService';
@@ -115,7 +116,8 @@ const FarmCard = ({ farm, onDelete }: FarmCardProps) => {
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: 1.5 
+            gap: 1.5,
+            mb: 2
           }}>
             <ShippingIcon color="primary" />
             <Box>
@@ -133,6 +135,31 @@ const FarmCard = ({ farm, onDelete }: FarmCardProps) => {
               </Typography>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 {farm.production_type.name}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1.5 
+          }}>
+            <LocationIcon color="primary" />
+            <Box>
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ 
+                  display: 'block',
+                  fontWeight: 500,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
+              >
+                Ubicación
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                {farm.municipio}, {farm.provincia}
               </Typography>
             </Box>
           </Box>

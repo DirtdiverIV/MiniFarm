@@ -14,7 +14,8 @@ import {
   Scale as ScaleIcon,
   Warning as WarningIcon,
   Agriculture as AgricultureIcon,
-  LocalShipping as ShippingIcon
+  LocalShipping as ShippingIcon,
+  LocationOn as LocationIcon
 } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
 import { themeColors } from '../theme/theme';
@@ -251,6 +252,31 @@ const FarmDetails = () => {
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {farm.production_type.name}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1.5 
+              }}>
+                <LocationIcon color="primary" />
+                <Box>
+                  <Typography 
+                    variant="caption" 
+                    color="text.secondary"
+                    sx={{ 
+                      display: 'block',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}
+                  >
+                    Ubicación
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {farm.municipio}, {farm.provincia}
                   </Typography>
                 </Box>
               </Box>

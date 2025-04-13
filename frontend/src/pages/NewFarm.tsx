@@ -42,6 +42,8 @@ const NewFarm = () => {
         name: values.name,
         farm_type_id: values.farm_type_id,
         production_type_id: values.production_type_id,
+        provincia: values.provincia,
+        municipio: values.municipio,
         image: values.image || undefined
       });
       

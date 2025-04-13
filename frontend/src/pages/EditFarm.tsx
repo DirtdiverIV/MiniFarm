@@ -37,6 +37,8 @@ const EditFarm = () => {
         name: data.name,
         farm_type_id: data.farm_type.id,
         production_type_id: data.production_type.id,
+        provincia: data.provincia,
+        municipio: data.municipio,
         image: null
       },
       message: 'Datos de la granja cargados exitosamente'
