@@ -1,27 +1,18 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
+import { CssBaseline, ThemeProvider } from '@mui/material'
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
+import theme from './theme/theme'
 
-// Crear un tema personalizado
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#4caf50', // Verde para un tema agrícola
-    },
-    secondary: {
-      main: '#ffc107', // Amarillo
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Arial", sans-serif',
-  },
-});
+const rootElement = document.getElementById('root')
+if (!rootElement) throw new Error('Failed to find the root element')
 
-createRoot(document.getElementById('root')!).render(
+const root = createRoot(rootElement)
+
+root.render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
@@ -31,5 +22,5 @@ createRoot(document.getElementById('root')!).render(
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 )

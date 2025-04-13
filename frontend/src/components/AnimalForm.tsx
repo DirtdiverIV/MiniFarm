@@ -4,13 +4,17 @@ import {
   TextField, 
   Button, 
   Typography,
-  Paper,
   InputAdornment,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  Divider,
+  Stack,
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import { ErrorMessage } from './ErrorMessage';
+import { Info as InfoIcon } from '@mui/icons-material';
 
 // Importar servicios y tipos
 import { getFarmById } from '../services/farmService';
@@ -95,160 +99,251 @@ const AnimalForm = memo(({
   }, [loadFarmType]);
   
   return (
-    <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-      <Typography variant="h6" gutterBottom>
-        {isEditing ? 'Editar Animal' : 'Nuevo Animal'}
-      </Typography>
-      
-      {error && <ErrorMessage error={error} />}
-      
-      <Formik
-        initialValues={initialValues || defaultValues}
-        validationSchema={AnimalFormSchema}
-        onSubmit={handleSubmit}
-        enableReinitialize
-      >
-        {({ isSubmitting, touched, errors, setFieldValue, values }) => (
-          <Form>
-            {formLoading ? (
-              <Box sx={{ my: 4 }}>
-                <Loading message="Guardando animal..." />
-              </Box>
-            ) : (
-              <Box sx={{ display: 'grid', gridGap: '16px', gridTemplateColumns: '1fr', width: '100%' }}>
-                <Box sx={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, 
-                  gap: 2 
-                }}>
-                  <Field
-                    as={TextField}
-                    name="animal_type"
-                    label="Tipo de Animal"
-                    fullWidth
-                    margin="normal"
-                    disabled
-                    value={animalType}
-                  />
-                  
-                  <Field
-                    as={TextField}
-                    name="identification_number"
-                    label="Número de Identificación"
-                    fullWidth
-                    margin="normal"
-                    error={touched.identification_number && !!errors.identification_number}
-                    helperText={
-                      (touched.identification_number && errors.identification_number) ||
-                      'Formato requerido: XXX000 (ejemplo: VAC001 para vacas, CER001 para cerdos, OVE001 para ovejas)'
-                    }
-                  />
+    <Box sx={{ width: '100%' }}>
+      <Stack spacing={3}>
+        <Box>
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              mb: 1,
+              fontWeight: 600,
+              color: 'primary.main'
+            }}
+          >
+            {isEditing ? 'Editar Animal' : 'Registro de Nuevo Animal'}
+          </Typography>
+          <Typography 
+            variant="body2" 
+            color="text.secondary"
+            sx={{ mb: 3 }}
+          >
+            Complete los detalles del animal para su registro en el sistema
+          </Typography>
+          
+          {error && <ErrorMessage error={error} />}
+        </Box>
+
+        <Formik
+          initialValues={initialValues || defaultValues}
+          validationSchema={AnimalFormSchema}
+          onSubmit={handleSubmit}
+          enableReinitialize
+        >
+          {({ isSubmitting, touched, errors, setFieldValue, values }) => (
+            <Form>
+              {formLoading ? (
+                <Box sx={{ my: 4 }}>
+                  <Loading message="Guardando animal..." />
                 </Box>
-                
-                <Box sx={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' }, 
-                  gap: 2 
-                }}>
-                  <Field
-                    as={TextField}
-                    name="weight"
-                    label="Peso"
-                    type="number"
-                    fullWidth
-                    margin="normal"
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                    }}
-                    error={touched.weight && !!errors.weight}
-                    helperText={touched.weight && errors.weight}
-                  />
-                  
-                  <Field
-                    as={TextField}
-                    name="age"
-                    label="Edad"
-                    type="number"
-                    fullWidth
-                    margin="normal"
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">años</InputAdornment>,
-                    }}
-                    error={touched.age && !!errors.age}
-                    helperText={touched.age && errors.age}
-                  />
-                  
-                  <Field
-                    as={TextField}
-                    name="estimated_production"
-                    label="Producción Estimada"
-                    type="number"
-                    fullWidth
-                    margin="normal"
-                    error={touched.estimated_production && !!errors.estimated_production}
-                    helperText={touched.estimated_production && errors.estimated_production}
-                  />
-                </Box>
-                
-                <Field
-                  as={TextField}
-                  name="sanitary_register"
-                  label="Registro Sanitario"
-                  fullWidth
-                  margin="normal"
-                  error={touched.sanitary_register && !!errors.sanitary_register}
-                  helperText={
-                    (touched.sanitary_register && errors.sanitary_register) ||
-                    'Formato requerido: SR000 (ejemplo: SR001)'
-                  }
-                />
-                
-                <FormControlLabel
-                  control={
-                    <Field
-                      as={Checkbox}
-                      name="has_incidents"
-                      checked={values.has_incidents}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setFieldValue('has_incidents', e.target.checked);
-                        if (!e.target.checked) {
-                          setFieldValue('incidents', '');
-                        }
+              ) : (
+                <Stack spacing={4}>
+                  <Box>
+                    <Typography 
+                      variant="subtitle1" 
+                      sx={{ 
+                        mb: 2,
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
                       }}
-                    />
-                  }
-                  label="¿Tiene incidencias?"
-                />
-                
-                {values.has_incidents && (
-                  <Field
-                    as={TextField}
-                    name="incidents"
-                    label="Incidencias"
-                    multiline
-                    rows={3}
-                    fullWidth
-                    margin="normal"
-                    error={touched.incidents && !!errors.incidents}
-                    helperText={touched.incidents && errors.incidents}
-                  />
-                )}
-                
-                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={isSubmitting || formLoading}
-                  >
-                    {isEditing ? 'Actualizar' : 'Crear'}
-                  </Button>
-                </Box>
-              </Box>
-            )}
-          </Form>
-        )}
-      </Formik>
-    </Paper>
+                    >
+                      Información Básica
+                      <Tooltip title="Información principal del animal">
+                        <IconButton size="small">
+                          <InfoIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Typography>
+
+                    <Box sx={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, 
+                      gap: 3
+                    }}>
+                      <Field
+                        as={TextField}
+                        name="animal_type"
+                        label="Tipo de Animal"
+                        fullWidth
+                        disabled
+                        value={animalType}
+                        sx={{
+                          '& .MuiInputBase-root': {
+                            backgroundColor: 'action.hover'
+                          }
+                        }}
+                      />
+                      
+                      <Field
+                        as={TextField}
+                        name="identification_number"
+                        label="Número de Identificación"
+                        fullWidth
+                        error={touched.identification_number && !!errors.identification_number}
+                        helperText={
+                          (touched.identification_number && errors.identification_number) ||
+                          'Formato: XXX000 (ej: VAC001)'
+                        }
+                      />
+                    </Box>
+                  </Box>
+
+                  <Divider />
+
+                  <Box>
+                    <Typography 
+                      variant="subtitle1" 
+                      sx={{ 
+                        mb: 2,
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      Características Físicas
+                      <Tooltip title="Detalles físicos y productivos del animal">
+                        <IconButton size="small">
+                          <InfoIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Typography>
+
+                    <Box sx={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' }, 
+                      gap: 3
+                    }}>
+                      <Field
+                        as={TextField}
+                        name="weight"
+                        label="Peso"
+                        type="number"
+                        fullWidth
+                        InputProps={{
+                          endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                        }}
+                        error={touched.weight && !!errors.weight}
+                        helperText={touched.weight && errors.weight}
+                      />
+                      
+                      <Field
+                        as={TextField}
+                        name="age"
+                        label="Edad"
+                        type="number"
+                        fullWidth
+                        InputProps={{
+                          endAdornment: <InputAdornment position="end">años</InputAdornment>,
+                        }}
+                        error={touched.age && !!errors.age}
+                        helperText={touched.age && errors.age}
+                      />
+                      
+                      <Field
+                        as={TextField}
+                        name="estimated_production"
+                        label="Producción Estimada"
+                        type="number"
+                        fullWidth
+                        error={touched.estimated_production && !!errors.estimated_production}
+                        helperText={touched.estimated_production && errors.estimated_production}
+                      />
+                    </Box>
+                  </Box>
+
+                  <Divider />
+
+                  <Box>
+                    <Typography 
+                      variant="subtitle1" 
+                      sx={{ 
+                        mb: 2,
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      Información Sanitaria
+                      <Tooltip title="Registro sanitario e incidencias">
+                        <IconButton size="small">
+                          <InfoIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Typography>
+
+                    <Stack spacing={2}>
+                      <Field
+                        as={TextField}
+                        name="sanitary_register"
+                        label="Registro Sanitario"
+                        fullWidth
+                        error={touched.sanitary_register && !!errors.sanitary_register}
+                        helperText={
+                          (touched.sanitary_register && errors.sanitary_register) ||
+                          'Formato: SR000 (ej: SR001)'
+                        }
+                      />
+                      
+                      <FormControlLabel
+                        control={
+                          <Field
+                            as={Checkbox}
+                            name="has_incidents"
+                            checked={values.has_incidents}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                              setFieldValue('has_incidents', e.target.checked);
+                              if (!e.target.checked) {
+                                setFieldValue('incidents', '');
+                              }
+                            }}
+                          />
+                        }
+                        label="¿Tiene incidencias?"
+                      />
+                      
+                      {values.has_incidents && (
+                        <Field
+                          as={TextField}
+                          name="incidents"
+                          label="Incidencias"
+                          multiline
+                          rows={3}
+                          fullWidth
+                          error={touched.incidents && !!errors.incidents}
+                          helperText={touched.incidents && errors.incidents}
+                        />
+                      )}
+                    </Stack>
+                  </Box>
+
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'flex-end',
+                    pt: 2 
+                  }}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      size="large"
+                      disabled={isSubmitting || formLoading}
+                      sx={{
+                        minWidth: 200,
+                        height: 48
+                      }}
+                    >
+                      {isEditing ? 'Actualizar Animal' : 'Crear Animal'}
+                    </Button>
+                  </Box>
+                </Stack>
+              )}
+            </Form>
+          )}
+        </Formik>
+      </Stack>
+    </Box>
   );
 });
 

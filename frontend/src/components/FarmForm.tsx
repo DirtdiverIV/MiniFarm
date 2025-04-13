@@ -176,7 +176,10 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
                     <img 
                       src={selectedImage} 
                       alt="Vista previa" 
-                      style={{ maxWidth: '100%', borderRadius: 4 }} 
+                      style={{ 
+                        maxWidth: '100%', 
+                        borderRadius: '4px'
+                      }} 
                     />
                   </Box>
                 )}

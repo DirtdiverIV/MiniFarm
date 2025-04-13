@@ -20,19 +20,28 @@ import {
 import { Animal } from '../services/animalService';
 import SearchField from './SearchField';
 import { useTableData } from '../hooks/useTableData';
+import { alpha } from '@mui/material/styles';
+import { themeColors } from '../theme/theme';
+
+// Extendemos el tipo Animal para la versión del dashboard
+interface DashboardAnimal extends Animal {
+  farm_name: string;
+}
 
 interface AnimalsTableProps {
-  animals: Animal[];
+  animals: Animal[] | DashboardAnimal[];
   onEditAnimal?: (animal: Animal) => void;
   onDeleteAnimal?: (id: number) => void;
   title?: string;
+  isDashboard?: boolean;
 }
 
 const AnimalsTable = ({ 
   animals, 
   onEditAnimal, 
   onDeleteAnimal, 
-  title = 'Animales' 
+  title = 'Animales',
+  isDashboard = false
 }: AnimalsTableProps) => {
   const {
     page,
@@ -45,7 +54,9 @@ const AnimalsTable = ({
     handleSearchChange
   } = useTableData({
     data: animals,
-    searchFields: ['animal_type', 'identification_number', 'farm.name'],
+    searchFields: isDashboard 
+      ? ['animal_type', 'identification_number', 'farm_name']
+      : ['animal_type', 'identification_number', 'sanitary_register'],
     initialRowsPerPage: 5
   });
 
@@ -68,78 +79,242 @@ const AnimalsTable = ({
   }, [onDeleteAnimal]);
 
   return (
-    <Paper elevation={2} sx={{ p: 2 }}>
+    <Paper 
+      elevation={2} 
+      sx={{ 
+        p: 2, 
+        backgroundColor: themeColors.surface.containerLowest,
+        borderRadius: 2,
+        overflow: 'hidden'
+      }}
+    >
       <Box sx={{ mb: 2 }}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" gutterBottom color={themeColors.text.primary}>
           {title}
         </Typography>
         <SearchField
           value={searchTerm}
           onChange={handleSearchChange}
-          placeholder="Buscar por tipo, identificación o granja..."
+          placeholder={isDashboard 
+            ? "Buscar por tipo, identificación o granja..." 
+            : "Buscar por tipo, identificación o registro sanitario..."}
         />
       </Box>
 
-      <TableContainer>
+      <TableContainer sx={{ borderRadius: 1, overflow: 'hidden' }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Tipo</TableCell>
-              <TableCell>Identificación</TableCell>
-              <TableCell>Granja</TableCell>
-              <TableCell>Incidencias</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell 
+                sx={{ 
+                  backgroundColor: themeColors.primary.main,
+                  color: themeColors.primary.contrastText,
+                  fontWeight: 'bold'
+                }}
+              >
+                Tipo
+              </TableCell>
+              <TableCell 
+                sx={{ 
+                  backgroundColor: themeColors.primary.main,
+                  color: themeColors.primary.contrastText,
+                  fontWeight: 'bold'
+                }}
+              >
+                Identificación
+              </TableCell>
+              {!isDashboard && (
+                <>
+                  <TableCell 
+                    sx={{ 
+                      backgroundColor: themeColors.primary.main,
+                      color: themeColors.primary.contrastText,
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Peso (kg)
+                  </TableCell>
+                  <TableCell 
+                    sx={{ 
+                      backgroundColor: themeColors.primary.main,
+                      color: themeColors.primary.contrastText,
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Producción Est.
+                  </TableCell>
+                  <TableCell 
+                    sx={{ 
+                      backgroundColor: themeColors.primary.main,
+                      color: themeColors.primary.contrastText,
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Registro Sanitario
+                  </TableCell>
+                  <TableCell 
+                    sx={{ 
+                      backgroundColor: themeColors.primary.main,
+                      color: themeColors.primary.contrastText,
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Edad
+                  </TableCell>
+                </>
+              )}
+              {isDashboard && (
+                <TableCell 
+                  sx={{ 
+                    backgroundColor: themeColors.primary.main,
+                    color: themeColors.primary.contrastText,
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Granja
+                </TableCell>
+              )}
+              <TableCell 
+                sx={{ 
+                  backgroundColor: themeColors.primary.main,
+                  color: themeColors.primary.contrastText,
+                  fontWeight: 'bold'
+                }}
+              >
+                Incidencias
+              </TableCell>
+              {!isDashboard && (
+                <TableCell 
+                  sx={{ 
+                    backgroundColor: themeColors.primary.main,
+                    color: themeColors.primary.contrastText,
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Acciones
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
             {paginatedData.length > 0 ? (
-              paginatedData.map((animal) => (
-                <TableRow 
-                  key={animal.id}
-                  sx={{ 
-                    bgcolor: hasIncident(animal.incidents) ? 'error.light' : 'inherit',
-                    '&:hover': { bgcolor: hasIncident(animal.incidents) ? 'error.200' : 'action.hover' }
-                  }}
-                >
-                  <TableCell>{animal.animal_type}</TableCell>
-                  <TableCell>{animal.identification_number}</TableCell>
-                  <TableCell>{animal.farm?.name}</TableCell>
-                  <TableCell>
-                    {hasIncident(animal.incidents) ? (
-                      <Chip 
-                        label={animal.incidents} 
-                        color="error" 
-                        size="small"
-                      />
-                    ) : (
-                      'Ninguna'
+              paginatedData.map((animal, index) => {
+                const hasAnimalIncident = hasIncident(animal.incidents);
+                
+                return (
+                  <TableRow 
+                    key={animal.id}
+                    sx={{
+                      bgcolor: index % 2 === 0 
+                        ? themeColors.surface.containerLowest
+                        : themeColors.surface.containerLow,
+                      '&:hover': { 
+                        bgcolor: themeColors.surface.containerHigh
+                      },
+                      transition: 'background-color 0.2s'
+                    }}
+                  >
+                    <TableCell sx={{ color: themeColors.text.primary }}>
+                      {animal.animal_type}
+                    </TableCell>
+                    <TableCell sx={{ color: themeColors.text.primary }}>
+                      {animal.identification_number}
+                    </TableCell>
+                    {!isDashboard && (
+                      <>
+                        <TableCell sx={{ color: themeColors.text.primary }}>
+                          {animal.weight}
+                        </TableCell>
+                        <TableCell sx={{ color: themeColors.text.primary }}>
+                          {animal.estimated_production}
+                        </TableCell>
+                        <TableCell sx={{ color: themeColors.text.primary }}>
+                          {animal.sanitary_register}
+                        </TableCell>
+                        <TableCell sx={{ color: themeColors.text.primary }}>
+                          {animal.age}
+                        </TableCell>
+                      </>
                     )}
-                  </TableCell>
-                  <TableCell>
-                    {onEditAnimal && (
-                      <IconButton 
-                        size="small" 
-                        color="primary" 
-                        onClick={() => handleEdit(animal)}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
+                    {isDashboard && (
+                      <TableCell sx={{ color: themeColors.text.primary }}>
+                        {(animal as DashboardAnimal).farm_name}
+                      </TableCell>
                     )}
-                    {onDeleteAnimal && (
-                      <IconButton 
-                        size="small" 
-                        color="error" 
-                        onClick={() => handleDelete(animal.id)}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
+                    <TableCell>
+                      {hasAnimalIncident ? (
+                        <Chip 
+                          label={animal.incidents} 
+                          sx={{
+                            backgroundColor: themeColors.error.container,
+                            color: themeColors.error.dark,
+                            fontWeight: 'bold',
+                            borderRadius: '4px',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
+                            fontFamily: '"Roboto Mono", "Courier New", monospace'
+                          }}
+                          size="small"
+                        />
+                      ) : (
+                        <Typography variant="body2" sx={{ color: themeColors.text.secondary }}>Ninguna</Typography>
+                      )}
+                    </TableCell>
+                    {!isDashboard && (
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          {onEditAnimal && (
+                            <IconButton 
+                              size="small" 
+                              sx={{ 
+                                color: '#ffffff',
+                                backgroundColor: themeColors.primary.main,
+                                borderRadius: '4px',
+                                width: '28px',
+                                height: '28px',
+                                '&:hover': {
+                                  backgroundColor: themeColors.primary.dark,
+                                }
+                              }}
+                              onClick={() => handleEdit(animal)}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                          {onDeleteAnimal && (
+                            <IconButton 
+                              size="small" 
+                              sx={{ 
+                                color: '#ffffff',
+                                backgroundColor: themeColors.error.main,
+                                borderRadius: '4px',
+                                width: '28px',
+                                height: '28px',
+                                '&:hover': {
+                                  backgroundColor: themeColors.error.dark,
+                                }
+                              }}
+                              onClick={() => handleDelete(animal.id)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </Box>
+                      </TableCell>
                     )}
-                  </TableCell>
-                </TableRow>
-              ))
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell 
+                  colSpan={isDashboard ? 4 : 8} 
+                  align="center"
+                  sx={{ 
+                    color: themeColors.text.secondary,
+                    py: 4,
+                    backgroundColor: themeColors.surface.containerLowest
+                  }}
+                >
                   No hay animales para mostrar
                 </TableCell>
               </TableRow>
@@ -158,6 +333,18 @@ const AnimalsTable = ({
         onRowsPerPageChange={handleChangeRowsPerPage}
         labelRowsPerPage="Filas por página:"
         labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
+        sx={{
+          color: themeColors.text.primary,
+          '& .MuiIconButton-root': {
+            color: themeColors.primary.main,
+            '&:hover': {
+              backgroundColor: alpha(themeColors.primary.light, 0.1),
+            }
+          },
+          '& .Mui-disabled': {
+            color: themeColors.outline.main,
+          }
+        }}
       />
     </Paper>
   );

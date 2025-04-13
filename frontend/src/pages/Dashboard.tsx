@@ -1,18 +1,24 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Box, 
   Typography, 
   Container,
-  Button
+  Button,
+  IconButton
 } from '@mui/material';
 import { 
   Add as AddIcon,
   Pets as PetsIcon,
   Agriculture as AgricultureIcon,
   WaterDrop as WaterDropIcon,
-  LocalShipping as MeatIcon
+  LocalShipping as MeatIcon,
+  Warning as WarningIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { alpha } from '@mui/material/styles';
+import { themeColors } from '../theme/theme';
 
 // Componentes
 import StatCard from '../components/StatCard';
@@ -114,6 +120,37 @@ const Dashboard = () => {
     }
   };
 
+  const incidentsCount = dashboardApi.data?.animals_with_incidents?.length || 0;
+  const hasIncidents = incidentsCount > 0;
+
+  const [currentFarmPage, setCurrentFarmPage] = useState(0);
+  const farmsPerPage = 3;
+
+  const handleNextPage = () => {
+    if (farmsApi.data) {
+      setCurrentFarmPage(prev => 
+        prev + 1 >= Math.ceil((farmsApi.data?.length || 0) / farmsPerPage) ? 0 : prev + 1
+      );
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (farmsApi.data) {
+      setCurrentFarmPage(prev => 
+        prev - 1 < 0 ? Math.ceil((farmsApi.data?.length || 0) / farmsPerPage) - 1 : prev - 1
+      );
+    }
+  };
+
+  // Calcular granjas visibles
+  const visibleFarms = farmsApi.data ? farmsApi.data.slice(
+    currentFarmPage * farmsPerPage,
+    (currentFarmPage + 1) * farmsPerPage
+  ) : [];
+
+  const totalPages = farmsApi.data ? Math.ceil(farmsApi.data.length / farmsPerPage) : 0;
+  const showNavigation = (farmsApi.data?.length || 0) > farmsPerPage;
+
   // Renderizar estado de carga
   if ((dashboardApi.loading || farmsApi.loading) && !dashboardApi.data && !farmsApi.data) {
     return <Loading message="Cargando datos del dashboard..." />;
@@ -147,58 +184,158 @@ const Dashboard = () => {
           gridTemplateColumns: {
             xs: '1fr',
             sm: 'repeat(2, 1fr)',
-            md: 'repeat(4, 1fr)'
+            md: 'repeat(5, 1fr)'
           }, 
           gap: 3, 
           mb: 4 
         }}>
           <StatCard
             title="Total de Animales"
-            value={dashboardApi.data === null ? 0 : dashboardApi.data.total_animals}
+            value={dashboardApi.data?.total_animals ?? 0}
             icon={<PetsIcon />}
+            sx={(theme) => ({ 
+              backgroundColor: alpha(themeColors.primary.light, 0.2),
+              border: '1px solid',
+              borderColor: themeColors.outline.variant,
+            })}
           />
           <StatCard
             title="Total de Granjas"
-            value={farmsApi.data === null ? 0 : farmsApi.data.length}
+            value={farmsApi.data?.length ?? 0}
             icon={<AgricultureIcon />}
+            sx={(theme) => ({ 
+              backgroundColor: alpha(themeColors.secondary.light, 0.2),
+              border: '1px solid',
+              borderColor: themeColors.outline.variant,
+            })}
           />
           <StatCard
             title="Producción Cárnica"
-            value={dashboardApi.data === null ? 0 : dashboardApi.data.total_carne_production}
-            icon={<WaterDropIcon />}
+            value={dashboardApi.data?.total_carne_production ?? 0}
+            icon={<MeatIcon />}
+            sx={(theme) => ({ 
+              backgroundColor: alpha(themeColors.primary.light, 0.2),
+              border: '1px solid',
+              borderColor: themeColors.outline.variant,
+            })}
           />
           <StatCard
             title="Producción Láctea"
-            value={dashboardApi.data === null ? 0 : dashboardApi.data.total_leche_production}
-            icon={<MeatIcon />}
+            value={dashboardApi.data?.total_leche_production ?? 0}
+            icon={<WaterDropIcon />}
+            sx={(theme) => ({ 
+              backgroundColor: alpha(themeColors.tertiary.light, 0.2),
+              border: '1px solid',
+              borderColor: themeColors.outline.variant,
+            })}
+          />
+          <StatCard
+            title="Incidencias"
+            value={incidentsCount}
+            icon={<WarningIcon />}
+            color={hasIncidents ? 'error' : 'default'}
+            sx={theme => ({ 
+              backgroundColor: hasIncidents ? alpha(themeColors.error.light, 0.2) : themeColors.grey[100],
+              border: '1px solid',
+              borderColor: hasIncidents 
+                ? alpha(themeColors.error.main, 0.2)
+                : themeColors.outline.variant
+            })}
           />
         </Box>
 
         {/* Lista de granjas */}
-        <Typography variant="h5" gutterBottom>
-          Mis Granjas
-        </Typography>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Mis Granjas
+          </Typography>
 
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: {
-            xs: '1fr',
-            sm: 'repeat(2, 1fr)',
-            md: 'repeat(3, 1fr)'
-          }, 
-          gap: 3, 
-          mb: 4 
-        }}>
-          {farmsApi.data && farmsApi.data.length > 0 ? (
-            farmsApi.data.map((farm) => (
-              <Box key={farm.id}>
-                <FarmCard farm={farm} onDelete={handleFarmDelete} />
-              </Box>
-            ))
-          ) : (
-            <Typography variant="body1" color="text.secondary">
-              No hay granjas disponibles
-            </Typography>
+          <Box sx={{ position: 'relative' }}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 3,
+              position: 'relative',
+            }}>
+              {visibleFarms.map((farm) => (
+                <Box key={farm.id}>
+                  <FarmCard farm={farm} onDelete={handleFarmDelete} />
+                </Box>
+              ))}
+            </Box>
+
+            {showNavigation && (
+              <>
+                <IconButton
+                  onClick={handlePrevPage}
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    left: -20,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    bgcolor: themeColors.primary.main,
+                    color: themeColors.common.white,
+                    boxShadow: theme.shadows[3],
+                    width: 40,
+                    height: 40,
+                    '&:hover': {
+                      bgcolor: themeColors.primary.dark,
+                    },
+                    '&:disabled': {
+                      bgcolor: themeColors.surface.containerHigh,
+                    }
+                  })}
+                >
+                  <ChevronLeftIcon />
+                </IconButton>
+                <IconButton
+                  onClick={handleNextPage}
+                  sx={(theme) => ({
+                    position: 'absolute',
+                    right: -20,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    bgcolor: themeColors.primary.main,
+                    color: themeColors.common.white,
+                    boxShadow: theme.shadows[3],
+                    width: 40,
+                    height: 40,
+                    '&:hover': {
+                      bgcolor: themeColors.primary.dark,
+                    },
+                    '&:disabled': {
+                      bgcolor: themeColors.surface.containerHigh,
+                    }
+                  })}
+                >
+                  <ChevronRightIcon />
+                </IconButton>
+              </>
+            )}
+          </Box>
+
+          {totalPages > 1 && (
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              gap: 1, 
+              mt: 2 
+            }}>
+              {[...Array(totalPages)].map((_, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: currentFarmPage === index ? themeColors.primary.main : themeColors.outline.main,
+                    transition: 'all 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setCurrentFarmPage(index)}
+                />
+              ))}
+            </Box>
           )}
         </Box>
         
@@ -207,6 +344,7 @@ const Dashboard = () => {
           <AnimalsTable 
             animals={dashboardApi.data === null ? [] : dashboardApi.data.animals_with_incidents.map(convertToAnimal)}
             title="Animales con Incidencias"
+            isDashboard={true}
           />
         </Box>
       </Box>
@@ -239,6 +377,7 @@ const convertToAnimal = (animalWithIncident: AnimalWithIncident) => {
     animal_type: animalWithIncident.animal_type,
     identification_number: animalWithIncident.identification_number,
     incidents: animalWithIncident.incidents,
+    farm_name: animalWithIncident.farm_name,
     farm: {
       id: 0, // No tenemos el ID de la granja en este objeto
       name: animalWithIncident.farm_name

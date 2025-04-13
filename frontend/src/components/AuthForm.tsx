@@ -7,7 +7,8 @@ import {
   Typography, 
   Alert
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { styled } from '@mui/material/styles'; // Importar styled
+import { Link as RouterLink } from 'react-router-dom';
 import { Form, Formik, Field } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
@@ -42,12 +43,18 @@ const registerSchema = Yup.object().shape({
     .required('Confirma tu contraseña')
 });
 
+const StyledLink = styled(RouterLink)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  textDecoration: 'underline',
+  '&:hover': {
+    color: theme.palette.primary.dark,
+  }
+}));
+
 const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
   const isLogin = type === 'login';
   const { error, loading, clearError } = useAuth();
   
-  console.log('Estado actual del error:', error); // Debug log
-
   const initialValues: AuthFormValues = {
     email: '',
     password: '',
@@ -93,10 +100,8 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
             onSubmit={async (values, { setSubmitting }) => {
               clearError(); // Limpiar error anterior antes de intentar nuevo login
               try {
-                console.log('Enviando formulario con:', values); // Debug log
                 await onSubmit(values);
               } catch (error) {
-                console.log('Error en el envío del formulario:', error); // Debug log
               } finally {
                 setSubmitting(false);
               }
@@ -149,9 +154,9 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
                   {isLogin ? 'Iniciar Sesión' : 'Registrarse'}
                 </Button>
                 <Box sx={{ textAlign: 'center' }}>
-                  <Link to={isLogin ? '/register' : '/login'}>
+                  <StyledLink to={isLogin ? '/register' : '/login'}>
                     {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
-                  </Link>
+                  </StyledLink>
                 </Box>
               </Form>
             )}

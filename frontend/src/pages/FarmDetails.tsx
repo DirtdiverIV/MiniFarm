@@ -4,15 +4,20 @@ import {
   Box, 
   Typography, 
   Container, 
-  Button
+  Button,
+  Paper
 } from '@mui/material';
 import { 
   Add as AddIcon,
   ArrowBack as ArrowBackIcon,
   Pets as PetsIcon,
-  Balance as BalanceIcon,
-  FilterFrames as ProductionIcon
+  Scale as ScaleIcon,
+  Warning as WarningIcon,
+  Agriculture as AgricultureIcon,
+  LocalShipping as ShippingIcon
 } from '@mui/icons-material';
+import { alpha } from '@mui/material/styles';
+import { themeColors } from '../theme/theme';
 
 // Componentes
 import StatCard from '../components/StatCard';
@@ -157,6 +162,10 @@ const FarmDetails = () => {
   const totalAnimals = animals.length;
   const totalProduction = animals.reduce((sum, animal) => sum + animal.estimated_production, 0);
   const animalsWithIncidents = animals.filter(animal => animal.incidents && animal.incidents !== '').length;
+  const hasIncidents = animalsWithIncidents > 0;
+  const averageWeight = animals.length > 0 
+    ? animals.reduce((sum, animal) => sum + animal.weight, 0) / animals.length 
+    : 0;
 
   if (!farm) {
     return null;
@@ -168,95 +177,181 @@ const FarmDetails = () => {
         <Box sx={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
-          alignItems: 'center' 
+          alignItems: 'flex-start',
+          mb: 4,
+          gap: 3
         }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={handleBackClick}
-          >
-            Volver al Dashboard
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleAddAnimal}
-          >
-            Nuevo Animal
-          </Button>
-        </Box>
-      </Box>
+          <Box sx={{ flex: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={handleBackClick}
+                sx={{
+                  color: 'text.secondary',
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                  }
+                }}
+              >
+                Volver
+              </Button>
+              <Typography variant="h4" color="text.primary">
+                {farm.name}
+              </Typography>
+            </Box>
 
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          {farm.name}
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-          Tipo: {farm.farm_type.name} | Producción: {farm.production_type.name}
-        </Typography>
-        
-        {/* Imagen de la granja */}
-        {farm.image_path && (
-          <Box 
-            sx={{ 
-              mt: 2, 
-              mb: 4, 
-              maxWidth: '100%',
-              height: 300,
-              position: 'relative',
-              overflow: 'hidden',
-              borderRadius: 2
-            }}
-          >
-            <img
-              src={`http://localhost:4000${farm.image_path}`}
-              alt={farm.name}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover'
-              }}
-            />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 2 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1.5,
+              }}>
+                <AgricultureIcon color="primary" />
+                <Box>
+                  <Typography 
+                    variant="caption" 
+                    color="text.secondary"
+                    sx={{ 
+                      display: 'block',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}
+                  >
+                    Tipo de Granja
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {farm.farm_type.name}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1.5 
+              }}>
+                <ShippingIcon color="primary" />
+                <Box>
+                  <Typography 
+                    variant="caption" 
+                    color="text.secondary"
+                    sx={{ 
+                      display: 'block',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}
+                  >
+                    Tipo de Producción
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {farm.production_type.name}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={handleAddAnimal}
+                sx={{ ml: 'auto' }}
+              >
+                Nuevo Animal
+              </Button>
+            </Box>
           </Box>
-        )}
-      </Box>
 
-      {/* Estadísticas */}
-      <Box sx={{ 
-        display: 'grid', 
-        gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(2, 1fr)',
-          md: 'repeat(3, 1fr)'
-        }, 
-        gap: 3, 
-        mb: 4 
-      }}>
-        <StatCard
-          title="Total de Animales"
-          value={totalAnimals}
-          icon={<PetsIcon />}
-        />
-        <StatCard
-          title="Producción Total"
-          value={totalProduction}
-          icon={<ProductionIcon />}
-        />
-        <StatCard
-          title="Animales con Incidencias"
-          value={animalsWithIncidents}
-          icon={<BalanceIcon />}
-        />
-      </Box>
+          {farm.image_path && (
+            <Box 
+              sx={(theme) => ({
+                width: 200,
+                height: 120,
+                position: 'relative',
+                overflow: 'hidden',
+                borderRadius: theme.shape.borderRadius,
+                boxShadow: theme.shadows[4]
+              })}
+            >
+              <img
+                src={`http://localhost:4000${farm.image_path}`}
+                alt={farm.name}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+            </Box>
+          )}
+        </Box>
 
-      {/* Lista de Animales */}
-      <Box sx={{ mt: 4 }}>
-        <AnimalsTable 
-          animals={animals}
-          onEditAnimal={(animal) => handleEditAnimal(animal.id)}
-          onDeleteAnimal={handleDeleteAnimal}
-          title="Animales de la Granja"
-        />
+        {/* Estadísticas */}
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(4, 1fr)'
+          }, 
+          gap: 3, 
+          mb: 4 
+        }}>
+          <StatCard
+            title="Total Animales"
+            value={totalAnimals}
+            icon={<PetsIcon />}
+            sx={(theme) => ({
+              backgroundColor: alpha(themeColors.primary.light, 0.2),
+              border: '1px solid',
+              borderColor: themeColors.outline.variant,
+            })}
+          />
+          <StatCard
+            title="Peso Promedio"
+            value={Math.round(averageWeight)}
+            icon={<ScaleIcon />}
+            sx={(theme) => ({
+              backgroundColor: alpha(themeColors.secondary.light, 0.2),
+              border: '1px solid',
+              borderColor: themeColors.outline.variant,
+            })}
+          />
+          <StatCard
+            title="Producción Total"
+            value={totalProduction}
+            icon={<PetsIcon />}
+            sx={(theme) => ({
+              backgroundColor: alpha(themeColors.primary.light, 0.2),
+              border: '1px solid',
+              borderColor: themeColors.outline.variant,
+            })}
+          />
+          <StatCard
+            title="Incidencias"
+            value={animalsWithIncidents}
+            icon={<WarningIcon />}
+            color={hasIncidents ? 'error' : 'default'}
+            sx={(theme) => ({
+              backgroundColor: hasIncidents ? alpha(themeColors.error.light, 0.2) : themeColors.grey[100],
+              border: '1px solid',
+              borderColor: hasIncidents 
+                ? alpha(themeColors.error.main, 0.2)
+                : themeColors.outline.variant
+            })}
+          />
+        </Box>
+
+        {/* Lista de Animales */}
+        <Box sx={{ mt: 4 }}>
+          <AnimalsTable 
+            animals={animals}
+            onEditAnimal={(animal) => handleEditAnimal(animal.id)}
+            onDeleteAnimal={handleDeleteAnimal}
+            title="Animales de la Granja"
+          />
+        </Box>
       </Box>
 
       {/* Componentes de UI global */}
