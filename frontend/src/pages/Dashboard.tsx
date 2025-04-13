@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { 
   Box, 
   Typography, 
-  Fab,
   Container,
   Button
 } from '@mui/material';

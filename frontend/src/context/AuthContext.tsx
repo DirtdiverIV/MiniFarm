@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error: unknown) {
       const apiError = error as ApiError;
       const errorMessage = apiError.response?.data?.error;
-      setError(errorMessage === undefined ? 'Error al iniciar sesión' : errorMessage);
+      setError(errorMessage ?? 'Error al iniciar sesión');
       throw error;
     } finally {
       setLoading(false);
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error: unknown) {
       const apiError = error as ApiError;
       const errorMessage = apiError.response?.data?.error;
-      setError(errorMessage === undefined ? 'Error al registrar' : errorMessage);
+      setError(errorMessage ?? 'Error al registrar');
       throw error;
     } finally {
       setLoading(false);

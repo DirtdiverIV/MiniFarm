@@ -27,6 +27,11 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     (req as any).userId = payload.userId;
     next();
   } catch (error) {
-    return res.status(403).json({ error: 'Token inválido o expirado' });
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(403).json({ error: 'Token inválido' });
+    } else if (error instanceof jwt.TokenExpiredError) {
+      return res.status(403).json({ error: 'Token expirado' });
+    }
+    return res.status(500).json({ error: 'Error en la autenticación' });
   }
 }

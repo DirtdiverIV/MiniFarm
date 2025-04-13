@@ -8,11 +8,12 @@ const Register = () => {
     try {
       const { confirmPassword, ...credentials } = values;
       await register(credentials);
-    } catch (err) {
+    } catch (error) {
+      console.error('Error en el registro:', error);
       // Los errores son manejados en dos niveles:
       // 1. AuthContext: maneja el estado de error y muestra mensajes
       // 2. useFormHandling: maneja errores de formulario
-      throw err;
+      throw error;
     }
   };
 

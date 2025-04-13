@@ -3,7 +3,7 @@ import { ErrorCode, ApiError } from '../types/errors';
 
 // Crear instancia de axios
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api',
   headers: {
     'Content-Type': 'application/json'
   }
@@ -18,7 +18,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(new Error(error.message || 'Request configuration error'))
 );
 
 // Función para transformar errores de axios en ApiError
@@ -36,7 +36,7 @@ const transformError = (error: unknown): ApiError => {
       case 400:
         return {
           code: ErrorCode.BAD_REQUEST,
-          message: error.response?.data?.message || 'Solicitud inválida',
+          message: error.response?.data?.message ?? 'Solicitud inválida',
           status,
           details: error.response?.data?.details
         };
@@ -94,6 +94,6 @@ api.interceptors.response.use(
       window.location.href = '/login';
     }
     
-    return Promise.reject(apiError);
+    return Promise.reject(new Error(apiError.message));
   }
 ); 

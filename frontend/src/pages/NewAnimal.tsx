@@ -78,7 +78,7 @@ const NewAnimal = () => {
         
         <AnimalForm 
           onSubmit={handleSubmit}
-          farmId={parseInt(farmId || '0')}
+          farmId={parseInt(farmId ?? '0')}
         />
         
         <AlertMessage

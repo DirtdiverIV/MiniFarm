@@ -47,7 +47,7 @@ export const useApi = <T, P = any>(
       const response = await apiFunction(params);
 
       if (!response.success) {
-        throw new Error(response.message === undefined ? 'Error en la operación' : response.message);
+        throw new Error(response.message ?? 'Error en la operación');
       }
 
       setState(prev => ({ ...prev, data: response.data, loading: false }));
@@ -101,12 +101,12 @@ interface UpdateParams<T> {
 
 export const useCrudApi = <T>(operations: CrudOperations<T>) => {
   const getAll = useApi<T[]>(() => operations.getAll());
-  const getById = useApi<T, number>((id) => operations.getById(id!));
-  const create = useApi<T, Partial<T>>((data) => operations.create(data!));
+  const getById = useApi<T, number>((id) => operations.getById(id ?? 0));
+  const create = useApi<T, Partial<T>>((data) => operations.create(data ?? {}));
   const update = useApi<T, UpdateParams<T>>((params) => 
-    operations.update(params!.id, params!.data)
+    operations.update(params?.id ?? 0, params?.data ?? {})
   );
-  const remove = useApi<void, number>((id) => operations.delete(id!));
+  const remove = useApi<void, number>((id) => operations.delete(id ?? 0));
 
   return {
     getAll,

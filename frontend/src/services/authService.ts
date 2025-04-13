@@ -35,7 +35,7 @@ interface ApiError {
 // Función para manejar errores de la API
 const handleApiError = (error: unknown): never => {
   const apiError = error as ApiError;
-  const errorMessage = apiError.response?.data?.error || apiError.message || 'Error desconocido';
+  const errorMessage = apiError.response?.data?.error ?? apiError.message ?? 'Error desconocido';
   
   if (apiError.response?.status === 401) {
     throw new Error('Credenciales inválidas');

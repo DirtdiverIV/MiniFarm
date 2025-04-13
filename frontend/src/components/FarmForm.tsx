@@ -61,7 +61,7 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
   const { selectedImage, handleImageChange, clearImage } = useImagePreview();
   const { handleSubmit, error, loading: formLoading } = useFormHandling({
     onSubmit,
-    initialValues: initialValues || defaultValues,
+    initialValues: initialValues ?? defaultValues,
     isEditing,
     onSuccess: () => {
       if (!isEditing) {
@@ -79,7 +79,7 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
       {error && <ErrorMessage error={error} />}
       
       <Formik
-        initialValues={initialValues || defaultValues}
+        initialValues={initialValues ?? defaultValues}
         validationSchema={FarmFormSchema}
         onSubmit={handleSubmit}
         enableReinitialize

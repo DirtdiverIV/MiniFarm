@@ -85,7 +85,7 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
         >
           {error && (
             <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-              {error.message || 'Error en la autenticación'}
+              {error.message ?? 'Error en la autenticación'}
             </Alert>
           )}
           <Formik

@@ -7,9 +7,9 @@ const Login = () => {
   const handleSubmit = async (values: { email: string; password: string }) => {
     try {
       await login(values);
-    } catch (err) {
-      // El error ya es manejado por el AuthContext
-      throw err; // Propagamos el error para que useFormHandling lo maneje
+    } catch (error) {
+      console.error('Error en el inicio de sesión:', error);
+      throw error;
     }
   };
 

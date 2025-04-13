@@ -65,6 +65,18 @@ const EditAnimal = () => {
     setAlertOpen(true);
   };
   
+  const getFarmIdFromUpdatedAnimal = (updatedAnimal: any) => {
+    if (farmId !== undefined) return farmId;
+    if (updatedAnimal.farm?.id !== undefined) return updatedAnimal.farm.id;
+    return 0;
+  };
+
+  const getFarmIdFromInitialValues = () => {
+    if (farmId !== undefined) return farmId;
+    if (initialValues?.farm_id !== undefined) return initialValues.farm_id;
+    return 0;
+  };
+
   // Manejar la actualización del animal
   const handleUpdateAnimal = async (values: AnimalFormValues) => {
     if (!id) return;
@@ -87,7 +99,7 @@ const EditAnimal = () => {
       
       // Esperar un momento antes de redirigir para que el usuario vea el mensaje
       setTimeout(() => {
-        const farmIdToUse = farmId === undefined ? (updatedAnimal.farm?.id === undefined ? 0 : updatedAnimal.farm.id) : farmId;
+        const farmIdToUse = getFarmIdFromUpdatedAnimal(updatedAnimal);
         navigate(`/farms/${farmIdToUse}`);
       }, 1500);
       
@@ -101,7 +113,7 @@ const EditAnimal = () => {
   
   // Manejar el regreso a la página de detalles de granja
   const handleBack = () => {
-    const farmIdToUse = farmId === undefined ? (initialValues?.farm_id === undefined ? 0 : initialValues.farm_id) : farmId;
+    const farmIdToUse = getFarmIdFromInitialValues();
     navigate(`/farms/${farmIdToUse}`);
   };
   

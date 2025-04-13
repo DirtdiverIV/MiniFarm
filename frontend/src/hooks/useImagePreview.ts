@@ -17,7 +17,7 @@ export const useImagePreview = (): UseImagePreviewReturn => {
       event: React.ChangeEvent<HTMLInputElement>,
       setFieldValue: (field: string, value: any) => void
     ) => {
-      if (event.target.files && event.target.files[0]) {
+      if (event.target?.files?.[0]) {
         const file = event.target.files[0];
         setFieldValue('image', file);
         
