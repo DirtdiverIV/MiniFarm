@@ -23,49 +23,35 @@ api.interceptors.request.use(
 
 // Función para transformar errores de axios en ApiError
 const transformError = (error: unknown): ApiError => {
+  console.log('Error original:', error); // Debug log
+
   if (axios.isAxiosError(error)) {
     const status = error.response?.status;
+    const errorData = error.response?.data;
     
-    switch (status) {
-      case 401:
-        return {
-          code: ErrorCode.UNAUTHORIZED,
-          message: 'No autorizado. Por favor, inicie sesión nuevamente.',
-          status
-        };
-      case 400:
-        return {
-          code: ErrorCode.BAD_REQUEST,
-          message: error.response?.data?.message ?? 'Solicitud inválida',
-          status,
-          details: error.response?.data?.details
-        };
-      case 404:
-        return {
-          code: ErrorCode.NOT_FOUND,
-          message: 'Recurso no encontrado',
-          status
-        };
-      case 422:
-        return {
-          code: ErrorCode.VALIDATION_ERROR,
-          message: 'Error de validación',
-          status,
-          details: error.response?.data?.errors
-        };
-      case 500:
-        return {
-          code: ErrorCode.SERVER_ERROR,
-          message: 'Error en el servidor. Por favor, inténtelo más tarde.',
-          status
-        };
-      default:
-        return {
-          code: ErrorCode.UNKNOWN_ERROR,
-          message: 'Error desconocido',
-          status
-        };
+    console.log('Status:', status); // Debug log
+    console.log('Error data:', errorData); // Debug log
+    
+    if (status === 401) {
+      // Para errores de autenticación, mostrar mensaje genérico
+      return {
+        code: ErrorCode.UNAUTHORIZED,
+        message: 'Credenciales inválidas',
+        status
+      };
     }
+    
+    // Resto de los casos de error
+    return {
+      code: status === 400 ? ErrorCode.BAD_REQUEST :
+            status === 404 ? ErrorCode.NOT_FOUND :
+            status === 422 ? ErrorCode.VALIDATION_ERROR :
+            status === 500 ? ErrorCode.SERVER_ERROR :
+            ErrorCode.UNKNOWN_ERROR,
+      message: errorData?.error || errorData?.message || 'Error en la solicitud',
+      status,
+      details: errorData?.details
+    };
   }
 
   if (error instanceof Error) {
@@ -87,13 +73,13 @@ api.interceptors.response.use(
   (error) => {
     const apiError = transformError(error);
     
-    // Si es un error de autorización, limpiar el almacenamiento local
-    if (apiError.code === ErrorCode.UNAUTHORIZED) {
+    // Si es un error de autorización y NO estamos en la ruta de login, limpiar el almacenamiento local
+    if (apiError.code === ErrorCode.UNAUTHORIZED && !window.location.pathname.includes('/login')) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
     
-    return Promise.reject(new Error(apiError.message));
+    return Promise.reject(apiError);
   }
 ); 

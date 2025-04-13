@@ -5,12 +5,7 @@ const Login = () => {
   const { login } = useAuth();
 
   const handleSubmit = async (values: { email: string; password: string }) => {
-    try {
-      await login(values);
-    } catch (error) {
-      console.error('Error en el inicio de sesión:', error);
-      throw error;
-    }
+    await login(values);
   };
 
   return (

@@ -8,11 +8,9 @@ import {
   Alert
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { Form, Formik, Field, FormikProps } from 'formik';
+import { Form, Formik, Field } from 'formik';
 import * as Yup from 'yup';
-
-// Hooks personalizados
-import { useFormHandling } from '../hooks/useFormHandling';
+import { useAuth } from '../context/AuthContext';
 
 interface AuthFormValues {
   email: string;
@@ -46,18 +44,15 @@ const registerSchema = Yup.object().shape({
 
 const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
   const isLogin = type === 'login';
+  const { error, loading, clearError } = useAuth();
+  
+  console.log('Estado actual del error:', error); // Debug log
 
   const initialValues: AuthFormValues = {
     email: '',
     password: '',
     ...(isLogin ? {} : { confirmPassword: '' })
   };
-
-  const { handleSubmit, error, loading } = useFormHandling({
-    onSubmit,
-    initialValues,
-    resetToInitial: false
-  });
 
   return (
     <Container maxWidth="xs">
@@ -84,16 +79,30 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
           }}
         >
           {error && (
-            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-              {error.message ?? 'Error en la autenticación'}
+            <Alert 
+              severity="error" 
+              sx={{ width: '100%', mb: 2 }}
+              onClose={clearError}
+            >
+              {error.message}
             </Alert>
           )}
           <Formik
             initialValues={initialValues}
             validationSchema={isLogin ? loginSchema : registerSchema}
-            onSubmit={handleSubmit}
+            onSubmit={async (values, { setSubmitting }) => {
+              clearError(); // Limpiar error anterior antes de intentar nuevo login
+              try {
+                console.log('Enviando formulario con:', values); // Debug log
+                await onSubmit(values);
+              } catch (error) {
+                console.log('Error en el envío del formulario:', error); // Debug log
+              } finally {
+                setSubmitting(false);
+              }
+            }}
           >
-            {({ isSubmitting, touched, errors }: FormikProps<AuthFormValues>) => (
+            {({ errors: formErrors, touched, isSubmitting }) => (
               <Form style={{ width: '100%' }}>
                 <Field
                   as={TextField}
@@ -103,8 +112,8 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
                   label="Correo Electrónico"
                   type="email"
                   margin="normal"
-                  error={touched.email && !!errors.email}
-                  helperText={touched.email && errors.email}
+                  error={touched.email && !!formErrors.email}
+                  helperText={touched.email && formErrors.email}
                 />
                 <Field
                   as={TextField}
@@ -114,8 +123,8 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
                   label="Contraseña"
                   type="password"
                   margin="normal"
-                  error={touched.password && !!errors.password}
-                  helperText={touched.password && errors.password}
+                  error={touched.password && !!formErrors.password}
+                  helperText={touched.password && formErrors.password}
                 />
                 {!isLogin && (
                   <Field
@@ -126,8 +135,8 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
                     label="Confirmar Contraseña"
                     type="password"
                     margin="normal"
-                    error={touched.confirmPassword && !!errors.confirmPassword}
-                    helperText={touched.confirmPassword && errors.confirmPassword}
+                    error={touched.confirmPassword && !!formErrors.confirmPassword}
+                    helperText={touched.confirmPassword && formErrors.confirmPassword}
                   />
                 )}
                 <Button

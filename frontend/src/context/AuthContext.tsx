@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect, ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser, registerUser } from '../services/authService';
+import { ApiError, ErrorCode } from '../types/errors';
 
 // Definir tipos
 interface User {
@@ -27,28 +28,21 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => void;
-  error: string | null;
+  error: ApiError | null;
+  clearError: () => void;
 }
 
 // Crear contexto
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Tipo personalizado para errores de API
-interface ApiError {
-  response?: {
-    data?: {
-      error?: string;
-    };
-  };
-  message: string;
-}
-
 // Proveedor del contexto
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
   const navigate = useNavigate();
+
+  const clearError = () => setError(null);
 
   // Verificar si hay un token en localStorage al cargar
   useEffect(() => {
@@ -78,16 +72,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
     
     try {
+      console.log('Intentando login con:', credentials); // Debug log
       const response = await loginUser(credentials);
+      console.log('Respuesta exitosa:', response); // Debug log
+      
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
       setUser(response.user);
       navigate('/');
-    } catch (error: unknown) {
-      const apiError = error as ApiError;
-      const errorMessage = apiError.response?.data?.error;
-      setError(errorMessage ?? 'Error al iniciar sesión');
-      throw error;
+    } catch (error) {
+      console.log('Error capturado en login:', error); // Debug log
+      
+      // Asegurarnos de que el error sea del tipo correcto
+      if ((error as ApiError).code) {
+        setError(error as ApiError);
+      } else {
+        setError({
+          code: ErrorCode.UNKNOWN_ERROR,
+          message: error instanceof Error ? error.message : 'Error desconocido durante el inicio de sesión'
+        });
+      }
+      
+      // No redirigir en caso de error
+      return;
     } finally {
       setLoading(false);
     }
@@ -101,11 +108,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await registerUser(credentials);
       navigate('/login');
-    } catch (error: unknown) {
-      const apiError = error as ApiError;
-      const errorMessage = apiError.response?.data?.error;
-      setError(errorMessage ?? 'Error al registrar');
-      throw error;
+    } catch (error) {
+      if (error instanceof Error) {
+        const apiError = error as unknown as ApiError;
+        setError(apiError);
+      } else {
+        setError({
+          code: ErrorCode.UNKNOWN_ERROR,
+          message: 'Error desconocido durante el registro'
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -126,7 +138,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login,
     register,
     logout,
-    error
+    error,
+    clearError
   }), [user, loading, error]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
