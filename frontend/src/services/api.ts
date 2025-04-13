@@ -3,11 +3,16 @@ import { ErrorCode, ApiError } from '../types/errors';
 
 // Crear instancia de axios
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json'
   }
 });
+
+// Verificar si la URL es segura
+if (!import.meta.env.PROD && !import.meta.env.VITE_API_URL?.startsWith('https')) {
+  console.warn('⚠️ Advertencia: La API no está utilizando HTTPS. Esto no es seguro para transmisión de credenciales.');
+}
 
 // Interceptor para agregar el token de autorización
 api.interceptors.request.use(
@@ -23,14 +28,9 @@ api.interceptors.request.use(
 
 // Función para transformar errores de axios en ApiError
 const transformError = (error: unknown): ApiError => {
-  console.log('Error original:', error); // Debug log
-
   if (axios.isAxiosError(error)) {
     const status = error.response?.status;
     const errorData = error.response?.data;
-    
-    console.log('Status:', status); // Debug log
-    console.log('Error data:', errorData); // Debug log
     
     if (status === 401) {
       // Para errores de autenticación, mostrar mensaje genérico

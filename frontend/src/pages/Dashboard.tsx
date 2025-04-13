@@ -19,19 +19,22 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { alpha } from '@mui/material/styles';
 import { themeColors } from '../theme/theme';
+import { commonStyles } from '../theme/commonStyles';
 
 // Componentes
 import StatCard from '../components/StatCard';
 import FarmCard from '../components/FarmCard';
 import AnimalsTable from '../components/AnimalsTable';
 import Loading from '../components/Loading';
-import AlertMessage from '../components/AlertMessage';
+import Notification from '../components/Notification';
 import ConfirmDialog from '../components/ConfirmDialog';
+import PaginationControls from '../components/PaginationControls';
 
 // Hooks
 import { useApi } from '../hooks/useApi';
 import { useDialog } from '../hooks/useDialog';
 import { useAlert } from '../hooks/useAlert';
+import { useAnimalData } from '../hooks/useAnimalData';
 
 // Servicios
 import { getDashboardStats, DashboardStats, AnimalWithIncident } from '../services/dashboardService';
@@ -87,6 +90,9 @@ const Dashboard = () => {
 
   // Cargar datos al montar el componente
   useEffect(() => {
+    // Prevenir llamadas API innecesarias o bucles infinitos
+    if (dashboardApi.loading || farmsApi.loading) return;
+    
     const loadData = async () => {
       try {
         await Promise.all([
@@ -95,11 +101,13 @@ const Dashboard = () => {
         ]);
       } catch (error) {
         console.error('Error al cargar datos del dashboard:', error);
+        showAlert('Error al cargar datos del dashboard', 'error');
       }
     };
     
     loadData();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Dependencias vacías para ejecutar solo al montar
 
   // Manejadores de eventos
   const handleAddFarm = () => {
@@ -151,6 +159,9 @@ const Dashboard = () => {
   const totalPages = farmsApi.data ? Math.ceil(farmsApi.data.length / farmsPerPage) : 0;
   const showNavigation = (farmsApi.data?.length || 0) > farmsPerPage;
 
+  // Usar el hook personalizado para obtener los animales convertidos
+  const animalsWithIncidences = useAnimalData(dashboardApi.data?.animals_with_incidents || null);
+
   // Renderizar estado de carga
   if ((dashboardApi.loading || farmsApi.loading) && !dashboardApi.data && !farmsApi.data) {
     return <Loading message="Cargando datos del dashboard..." />;
@@ -193,40 +204,36 @@ const Dashboard = () => {
             title="Total de Animales"
             value={dashboardApi.data?.total_animals ?? 0}
             icon={<PetsIcon />}
-            sx={(theme) => ({ 
-              backgroundColor: alpha(themeColors.primary.light, 0.2),
-              border: '1px solid',
-              borderColor: themeColors.outline.variant,
+            sx={() => ({ 
+              ...commonStyles.cards.base,
+              ...commonStyles.cards.primary
             })}
           />
           <StatCard
             title="Total de Granjas"
             value={farmsApi.data?.length ?? 0}
             icon={<AgricultureIcon />}
-            sx={(theme) => ({ 
-              backgroundColor: alpha(themeColors.secondary.light, 0.2),
-              border: '1px solid',
-              borderColor: themeColors.outline.variant,
+            sx={() => ({ 
+              ...commonStyles.cards.base,
+              ...commonStyles.cards.secondary
             })}
           />
           <StatCard
             title="Producción Cárnica"
             value={dashboardApi.data?.total_carne_production ?? 0}
             icon={<MeatIcon />}
-            sx={(theme) => ({ 
-              backgroundColor: alpha(themeColors.primary.light, 0.2),
-              border: '1px solid',
-              borderColor: themeColors.outline.variant,
+            sx={() => ({ 
+              ...commonStyles.cards.base,
+              ...commonStyles.cards.primary
             })}
           />
           <StatCard
             title="Producción Láctea"
             value={dashboardApi.data?.total_leche_production ?? 0}
             icon={<WaterDropIcon />}
-            sx={(theme) => ({ 
-              backgroundColor: alpha(themeColors.tertiary.light, 0.2),
-              border: '1px solid',
-              borderColor: themeColors.outline.variant,
+            sx={() => ({ 
+              ...commonStyles.cards.base,
+              ...commonStyles.cards.tertiary
             })}
           />
           <StatCard
@@ -234,12 +241,9 @@ const Dashboard = () => {
             value={incidentsCount}
             icon={<WarningIcon />}
             color={hasIncidents ? 'error' : 'default'}
-            sx={theme => ({ 
-              backgroundColor: hasIncidents ? alpha(themeColors.error.light, 0.2) : themeColors.grey[100],
-              border: '1px solid',
-              borderColor: hasIncidents 
-                ? alpha(themeColors.error.main, 0.2)
-                : themeColors.outline.variant
+            sx={() => ({ 
+              ...commonStyles.cards.base,
+              ...(hasIncidents ? commonStyles.cards.error : { backgroundColor: themeColors.grey[100] })
             })}
           />
         </Box>
@@ -250,99 +254,31 @@ const Dashboard = () => {
             Mis Granjas
           </Typography>
 
-          <Box sx={{ position: 'relative' }}>
-            <Box sx={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 3,
-              position: 'relative',
-            }}>
-              {visibleFarms.map((farm) => (
-                <Box key={farm.id}>
-                  <FarmCard farm={farm} onDelete={handleFarmDelete} />
-                </Box>
-              ))}
-            </Box>
-
-            {showNavigation && (
-              <>
-                <IconButton
-                  onClick={handlePrevPage}
-                  sx={(theme) => ({
-                    position: 'absolute',
-                    left: -20,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    bgcolor: themeColors.primary.main,
-                    color: themeColors.common.white,
-                    boxShadow: theme.shadows[3],
-                    width: 40,
-                    height: 40,
-                    '&:hover': {
-                      bgcolor: themeColors.primary.dark,
-                    },
-                    '&:disabled': {
-                      bgcolor: themeColors.surface.containerHigh,
-                    }
-                  })}
-                >
-                  <ChevronLeftIcon />
-                </IconButton>
-                <IconButton
-                  onClick={handleNextPage}
-                  sx={(theme) => ({
-                    position: 'absolute',
-                    right: -20,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    bgcolor: themeColors.primary.main,
-                    color: themeColors.common.white,
-                    boxShadow: theme.shadows[3],
-                    width: 40,
-                    height: 40,
-                    '&:hover': {
-                      bgcolor: themeColors.primary.dark,
-                    },
-                    '&:disabled': {
-                      bgcolor: themeColors.surface.containerHigh,
-                    }
-                  })}
-                >
-                  <ChevronRightIcon />
-                </IconButton>
-              </>
+          <PaginationControls
+            items={farmsApi.data || []}
+            currentPage={currentFarmPage}
+            setCurrentPage={setCurrentFarmPage}
+            itemsPerPage={farmsPerPage}
+            renderItems={(visibleFarms) => (
+              <Box sx={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 3,
+              }}>
+                {visibleFarms.map((farm) => (
+                  <Box key={farm.id}>
+                    <FarmCard farm={farm} onDelete={handleFarmDelete} />
+                  </Box>
+                ))}
+              </Box>
             )}
-          </Box>
-
-          {totalPages > 1 && (
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              gap: 1, 
-              mt: 2 
-            }}>
-              {[...Array(totalPages)].map((_, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    bgcolor: currentFarmPage === index ? themeColors.primary.main : themeColors.outline.main,
-                    transition: 'all 0.2s',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => setCurrentFarmPage(index)}
-                />
-              ))}
-            </Box>
-          )}
+          />
         </Box>
         
         {/* Tabla de animales con incidencias */}
         <Box sx={{ mt: 4 }}>
           <AnimalsTable 
-            animals={dashboardApi.data === null ? [] : dashboardApi.data.animals_with_incidents.map(convertToAnimal)}
+            animals={animalsWithIncidences}
             title="Animales con Incidencias"
             isDashboard={true}
           />
@@ -350,11 +286,12 @@ const Dashboard = () => {
       </Box>
       
       {/* Componentes de UI global */}
-      <AlertMessage
+      <Notification
         open={alertOpen}
         severity={alertSeverity}
         message={alertMessage}
         onClose={closeAlert}
+        isSnackbar={true}
       />
       
       <ConfirmDialog
@@ -368,26 +305,6 @@ const Dashboard = () => {
       />
     </Container>
   );
-};
-
-// Función auxiliar para convertir AnimalWithIncident a Animal
-const convertToAnimal = (animalWithIncident: AnimalWithIncident) => {
-  return {
-    id: animalWithIncident.id,
-    animal_type: animalWithIncident.animal_type,
-    identification_number: animalWithIncident.identification_number,
-    incidents: animalWithIncident.incidents,
-    farm_name: animalWithIncident.farm_name,
-    farm: {
-      id: 0, // No tenemos el ID de la granja en este objeto
-      name: animalWithIncident.farm_name
-    },
-    // Valores por defecto para los campos requeridos que no están en AnimalWithIncident
-    weight: 0,
-    estimated_production: 0,
-    sanitary_register: '',
-    age: 0
-  };
 };
 
 export default Dashboard; 

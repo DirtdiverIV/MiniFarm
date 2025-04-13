@@ -102,6 +102,9 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
               try {
                 await onSubmit(values);
               } catch (error) {
+                // Los errores ya se manejan en AuthContext
+                // pero se captura aquí para no interrumpir el flujo
+                console.error('Error en el formulario:', error);
               } finally {
                 setSubmitting(false);
               }

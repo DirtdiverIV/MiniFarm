@@ -3,6 +3,36 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser, registerUser } from '../services/authService';
 import { ApiError, ErrorCode } from '../types/errors';
 
+// Funciones de utilidad para el almacenamiento seguro
+const secureStorage = {
+  // Sanitiza el contenido antes de guardarlo
+  setItem: (key: string, value: any): void => {
+    if (typeof value === 'object') {
+      localStorage.setItem(key, JSON.stringify(value));
+    } else {
+      localStorage.setItem(key, String(value));
+    }
+  },
+  
+  // Obtiene y valida el contenido
+  getItem: <T,>(key: string, defaultValue: T | null = null): T | null => {
+    const item = localStorage.getItem(key);
+    if (!item) return defaultValue;
+    
+    try {
+      // Intentar parsear como JSON
+      return JSON.parse(item) as T;
+    } catch (e) {
+      // Si no es JSON, devolver como string
+      return item as unknown as T;
+    }
+  },
+  
+  removeItem: (key: string): void => {
+    localStorage.removeItem(key);
+  }
+};
+
 // Definir tipos
 interface User {
   id: number;
@@ -44,19 +74,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const clearError = () => setError(null);
 
+  // Función para verificar si un token JWT ha expirado
+  const isTokenExpired = (token: string): boolean => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const { exp } = JSON.parse(jsonPayload);
+      // Comparar la fecha de expiración con la fecha actual
+      return exp * 1000 < Date.now();
+    } catch (error) {
+      // Si hay algún error al decodificar el token, asumir que ha expirado
+      return true;
+    }
+  };
+
   // Verificar si hay un token en localStorage al cargar
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
+      const token = secureStorage.getItem<string>('token');
+      const userData = secureStorage.getItem<User>('user');
       
       if (token && userData) {
         try {
-          setUser(JSON.parse(userData));
+          // Verificar si el token ha expirado
+          if (isTokenExpired(token)) {
+            // Si el token ha expirado, limpiar datos y dirigir al login
+            secureStorage.removeItem('token');
+            secureStorage.removeItem('user');
+            setUser(null);
+          } else {
+            setUser(userData);
+          }
         } catch (_) {
-          // Si hay un error al parsear el usuario, limpiar localStorage
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          // Si hay un error, limpiar localStorage
+          secureStorage.removeItem('token');
+          secureStorage.removeItem('user');
         }
       }
       
@@ -72,17 +130,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
     
     try {
-      console.log('Intentando login con:', credentials); // Debug log
       const response = await loginUser(credentials);
-      console.log('Respuesta exitosa:', response); // Debug log
       
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      secureStorage.setItem('token', response.token);
+      secureStorage.setItem('user', response.user);
       setUser(response.user);
       navigate('/');
     } catch (error) {
-      console.log('Error capturado en login:', error); // Debug log
-      
       // Asegurarnos de que el error sea del tipo correcto
       if ((error as ApiError).code) {
         setError(error as ApiError);
@@ -125,8 +179,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Función para cerrar sesión
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    secureStorage.removeItem('token');
+    secureStorage.removeItem('user');
     setUser(null);
     navigate('/login');
   };

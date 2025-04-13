@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { 
   Paper, 
   Table, 
@@ -18,10 +18,10 @@ import {
   Delete as DeleteIcon
 } from '@mui/icons-material';
 import { Animal } from '../services/animalService';
-import SearchField from './SearchField';
-import { useTableData } from '../hooks/useTableData';
+import SearchBar from './SearchBar';
 import { alpha } from '@mui/material/styles';
 import { themeColors } from '../theme/theme';
+import { useFilteredData } from '../hooks/useFilteredData';
 
 // Extendemos el tipo Animal para la versión del dashboard
 interface DashboardAnimal extends Animal {
@@ -43,22 +43,50 @@ const AnimalsTable = ({
   title = 'Animales',
   isDashboard = false
 }: AnimalsTableProps) => {
-  const {
-    page,
-    rowsPerPage,
-    searchTerm,
-    filteredData,
-    paginatedData,
-    handleChangePage,
-    handleChangeRowsPerPage,
-    handleSearchChange
-  } = useTableData({
-    data: animals,
-    searchFields: isDashboard 
-      ? ['animal_type', 'identification_number', 'farm_name']
-      : ['animal_type', 'identification_number', 'sanitary_register'],
-    initialRowsPerPage: 5
-  });
+  // Definir los campos de búsqueda según el tipo de tabla
+  const searchFields = isDashboard 
+    ? ['animal_type', 'identification_number', 'farm_name']
+    : ['animal_type', 'identification_number', 'sanitary_register'];
+  
+  // Función de filtrado para nuestro hook
+  const filterAnimal = useCallback((animal: Animal | DashboardAnimal, term: string) => {
+    const searchTerm = term.toLowerCase().trim();
+    
+    if (!searchTerm) return true;
+    
+    // Verificar cada campo de búsqueda
+    return searchFields.some(field => {
+      const value = (animal as any)[field];
+      return value && value.toString().toLowerCase().includes(searchTerm);
+    });
+  }, [searchFields]);
+  
+  // Usar nuestro hook personalizado de filtrado
+  const { 
+    filteredData, 
+    setSearchTerm,
+    searchTerm 
+  } = useFilteredData<Animal | DashboardAnimal>(animals, filterAnimal);
+  
+  // Estado para paginación
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  
+  // Calcular datos paginados
+  const paginatedData = useMemo(() => {
+    const startIndex = page * rowsPerPage;
+    return filteredData.slice(startIndex, startIndex + rowsPerPage);
+  }, [filteredData, page, rowsPerPage]);
+  
+  // Manejadores para paginación
+  const handleChangePage = (_: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+  
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   // Función simple para verificar incidencias
   const hasIncident = (incidents: string) => {
@@ -92,9 +120,9 @@ const AnimalsTable = ({
         <Typography variant="h6" gutterBottom color={themeColors.text.primary}>
           {title}
         </Typography>
-        <SearchField
-          value={searchTerm}
-          onChange={handleSearchChange}
+        <SearchBar
+          onSearch={setSearchTerm}
+          initialValue={searchTerm}
           placeholder={isDashboard 
             ? "Buscar por tipo, identificación o granja..." 
             : "Buscar por tipo, identificación o registro sanitario..."}
