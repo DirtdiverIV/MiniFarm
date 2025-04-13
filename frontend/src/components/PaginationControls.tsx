@@ -110,7 +110,7 @@ export const PaginationControls = <T,>({
         }}>
           {[...Array(totalPages)].map((_, index) => (
             <Box
-              key={index}
+              key={`pagination-indicator-${index}`}
               sx={{
                 ...commonStyles.navigation.paginationIndicator,
                 bgcolor: currentPage === index ? themeColors.primary.main : themeColors.outline.main,

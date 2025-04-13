@@ -26,45 +26,61 @@ api.interceptors.request.use(
   (error) => Promise.reject(new Error(error.message || 'Request configuration error'))
 );
 
+// Función para obtener el código de error basado en el status HTTP
+const getErrorCodeFromStatus = (status?: number): ErrorCode => {
+  if (status === 401) return ErrorCode.UNAUTHORIZED;
+  if (status === 400) return ErrorCode.BAD_REQUEST;
+  if (status === 404) return ErrorCode.NOT_FOUND;
+  if (status === 422) return ErrorCode.VALIDATION_ERROR;
+  if (status === 500) return ErrorCode.SERVER_ERROR;
+  return ErrorCode.UNKNOWN_ERROR;
+};
+
+// Función para crear un objeto ApiError
+const createApiError = (
+  code: ErrorCode, 
+  message: string, 
+  status?: number, 
+  details?: Record<string, unknown>
+): ApiError => {
+  const error: ApiError = { code, message };
+  if (status !== undefined) error.status = status;
+  if (details !== undefined) error.details = details;
+  return error;
+};
+
 // Función para transformar errores de axios en ApiError
 const transformError = (error: unknown): ApiError => {
+  // Manejar errores de Axios
   if (axios.isAxiosError(error)) {
     const status = error.response?.status;
     const errorData = error.response?.data;
+    const code = getErrorCodeFromStatus(status);
     
-    if (status === 401) {
-      // Para errores de autenticación, mostrar mensaje genérico
-      return {
-        code: ErrorCode.UNAUTHORIZED,
-        message: 'Credenciales inválidas',
-        status
-      };
+    // Mensaje personalizado para error de autorización
+    if (code === ErrorCode.UNAUTHORIZED) {
+      return createApiError(code, 'Credenciales inválidas', status);
     }
     
-    // Resto de los casos de error
-    return {
-      code: status === 400 ? ErrorCode.BAD_REQUEST :
-            status === 404 ? ErrorCode.NOT_FOUND :
-            status === 422 ? ErrorCode.VALIDATION_ERROR :
-            status === 500 ? ErrorCode.SERVER_ERROR :
-            ErrorCode.UNKNOWN_ERROR,
-      message: errorData?.error || errorData?.message || 'Error en la solicitud',
-      status,
-      details: errorData?.details
-    };
+    // Determinar el mensaje de error apropiado
+    let message = 'Error en la solicitud';
+    if (errorData?.error) {
+      message = errorData.error;
+    } else if (errorData?.message) {
+      message = errorData.message;
+    }
+    
+    const details = errorData?.details as Record<string, unknown> | undefined;
+    return createApiError(code, message, status, details);
   }
 
+  // Manejar errores estándar de JavaScript
   if (error instanceof Error) {
-    return {
-      code: ErrorCode.NETWORK_ERROR,
-      message: error.message
-    };
+    return createApiError(ErrorCode.NETWORK_ERROR, error.message);
   }
 
-  return {
-    code: ErrorCode.UNKNOWN_ERROR,
-    message: 'Error desconocido'
-  };
+  // Errores desconocidos
+  return createApiError(ErrorCode.UNKNOWN_ERROR, 'Error desconocido');
 };
 
 // Interceptor para manejar errores

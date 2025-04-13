@@ -4,9 +4,7 @@ import {
   Toolbar, 
   Typography, 
   IconButton,
-  Button,
   Tooltip,
-  useTheme
 } from '@mui/material';
 import { 
   Logout as LogoutIcon,
@@ -20,7 +18,6 @@ import { themeColors } from '../theme/theme';
 
 const Header = () => {
   const { logout, user } = useAuth();
-  const theme = useTheme();
 
   return (
     <AppBar 

@@ -58,7 +58,7 @@ const AnimalsTable = ({
     // Verificar cada campo de búsqueda
     return searchFields.some(field => {
       const value = (animal as any)[field];
-      return value && value.toString().toLowerCase().includes(searchTerm);
+      return value?.toString().toLowerCase().includes(searchTerm);
     });
   }, [searchFields]);
   
@@ -93,19 +93,13 @@ const AnimalsTable = ({
       valB = (b as DashboardAnimal).farm_name;
     }
 
-    // Comparación robusta que maneja null/undefined
-    if (valB == null && valA != null) return -1; // b es null/undefined, a no lo es -> a va primero
-    if (valA == null && valB != null) return 1;  // a es null/undefined, b no lo es -> b va primero
-    if (valA == null && valB == null) return 0; // Ambos son null/undefined -> son iguales
-
+    // Manejo de null/undefined y comparación
+    if (valA == null || valB == null) {
+      return (valA == null && valB != null) ? 1 : (valB == null && valA != null) ? -1 : 0;
+    }
+    
     // Comparación normal si ambos valores existen
-    if (valB < valA) {
-      return -1;
-    }
-    if (valB > valA) {
-      return 1;
-    }
-    return 0;
+    return valB < valA ? -1 : valB > valA ? 1 : 0;
   }
 
   // Tipo para la función de comparación
@@ -135,11 +129,10 @@ const AnimalsTable = ({
   }
   
   // Manejador para solicitar la ordenación
-  const handleRequestSort = (property: string) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+  const handleRequestSort = useCallback((property: string) => {
+    setOrder(orderBy === property && order === 'asc' ? 'desc' : 'asc');
     setOrderBy(property);
-  };
+  }, [order, orderBy]);
   
   // ---- Fin Lógica de ordenación ----
 
@@ -166,6 +159,38 @@ const AnimalsTable = ({
   const hasIncident = (incidents: string) => {
     return incidents && incidents.toLowerCase() !== 'ninguno' && incidents.trim() !== '';
   };
+
+  // Función para renderizar el contenido de una celda basado en el tipo de celda y datos del animal
+  const renderCellContent = useCallback((cell: HeadCell, animal: Animal | DashboardAnimal) => {
+    const key = cell.id as keyof (Animal | DashboardAnimal);
+    
+    if (cell.id === 'incidents') {
+      const hasAnimalIncident = hasIncident(animal.incidents);
+      return hasAnimalIncident ? (
+        <Chip 
+          label={animal.incidents} 
+          sx={{
+            backgroundColor: themeColors.error.container,
+            color: themeColors.error.dark,
+            fontWeight: 'bold',
+            borderRadius: '4px',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
+            fontFamily: '"Roboto Mono", "Courier New", monospace'
+          }}
+          size="small"
+        />
+      ) : (
+        <Typography variant="body2" sx={{ color: themeColors.text.secondary }}>Ninguna</Typography>
+      );
+    } 
+    
+    if (isDashboard && cell.id === 'farm_name') {
+      return (animal as DashboardAnimal).farm_name;
+    }
+    
+    // Valor predeterminado para otras celdas
+    return animal[key] != null ? String(animal[key]) : '-';
+  }, [isDashboard]);
 
   // Handlers memoizados para eventos de edición y eliminación
   const handleEdit = useCallback((animal: Animal) => {
@@ -216,6 +241,54 @@ const AnimalsTable = ({
     }
   }, [isDashboard]);
 
+  // Función para calcular el ancho de la celda
+  const getCellWidth = useCallback((headCell: HeadCell) => {
+    if (headCell.id === 'incidents') return '35%';
+    if (headCell.id === 'actions') return 100;
+    return 'auto';
+  }, []);
+
+  // Función para calcular el ancho mínimo de la celda
+  const getCellMinWidth = useCallback((headCell: HeadCell) => {
+    if (headCell.id === 'incidents') return 150;
+    if (headCell.numeric || headCell.id === 'identification_number') return 80;
+    return undefined;
+  }, []);
+
+  // Función para obtener los estilos del TableSortLabel
+  const getSortLabelStyles = useCallback((headCell: HeadCell) => {
+    // Determinar la dirección del texto según la alineación numérica
+    const labelFlexDirection = headCell.numeric ? 'row-reverse' : 'row';
+    
+    // Determinar la alineación según la alineación numérica
+    const labelJustification = headCell.numeric ? 'flex-end' : 'flex-start';
+    
+    // Determinar el color del icono según si está activo
+    const iconColor = orderBy === headCell.id 
+      ? themeColors.primary.contrastText + ' !important' 
+      : alpha(themeColors.primary.contrastText, 0.5);
+    
+    // Determinar el margen del icono según la alineación numérica
+    const iconMarginLeft = headCell.numeric ? '8px' : '0';
+    
+    return {
+      // Forzar dirección para que el icono esté siempre después del texto
+      flexDirection: labelFlexDirection,
+      // Ajustar para que el label ocupe espacio disponible si es necesario
+      width: '100%',
+      justifyContent: labelJustification,
+      '& .MuiTableSortLabel-icon': {
+        color: iconColor, 
+        // Añadir margen para separar icono del texto en celdas alineadas a la derecha
+        marginLeft: iconMarginLeft,
+      },
+      '&:hover': {
+        color: themeColors.primary.contrastText, // Color al pasar el ratón
+      },
+      color: themeColors.primary.contrastText, // Color del texto
+    };
+  }, [orderBy, themeColors]);
+
   return (
     <Paper 
       elevation={2} 
@@ -253,16 +326,8 @@ const AnimalsTable = ({
                     backgroundColor: themeColors.primary.main,
                     color: themeColors.primary.contrastText,
                     fontWeight: 'bold',
-                    // --- Reajustar anchos sin tableLayout fijo ---
-                    width: 
-                      headCell.id === 'incidents' ? '35%' : // Incidencias con % 
-                      headCell.id === 'actions' ? 100 : // Acciones con px fijo
-                      'auto', // Resto automático
-                    // Añadir minWidth a columnas específicas
-                    minWidth: 
-                      headCell.id === 'incidents' ? 150 : 
-                      (headCell.numeric || headCell.id === 'identification_number') ? 80 : 
-                      undefined, // Sin minWidth para el resto
+                    width: getCellWidth(headCell),
+                    minWidth: getCellMinWidth(headCell),
                   }}
                 >
                   {headCell.sortable ? (
@@ -270,22 +335,7 @@ const AnimalsTable = ({
                       active={orderBy === headCell.id}
                       direction={orderBy === headCell.id ? order : 'asc'}
                       onClick={() => handleRequestSort(headCell.id as string)}
-                      sx={{ 
-                        // Forzar dirección para que el icono esté siempre después del texto
-                        flexDirection: headCell.numeric ? 'row-reverse' : 'row',
-                        // Ajustar para que el label ocupe espacio disponible si es necesario
-                        width: '100%', 
-                        justifyContent: headCell.numeric ? 'flex-end' : 'flex-start',
-                        '& .MuiTableSortLabel-icon': {
-                          color: orderBy === headCell.id ? themeColors.primary.contrastText + ' !important' : alpha(themeColors.primary.contrastText, 0.5) , // Color del icono
-                          // Añadir margen para separar icono del texto en celdas alineadas a la derecha
-                          marginLeft: headCell.numeric ? '8px' : '0',
-                        },
-                        '&:hover': {
-                          color: themeColors.primary.contrastText, // Color al pasar el ratón
-                        },
-                        color: themeColors.primary.contrastText, // Color del texto
-                      }}
+                      sx={getSortLabelStyles(headCell)}
                     >
                       {headCell.label}
                     </TableSortLabel>
@@ -302,13 +352,16 @@ const AnimalsTable = ({
                 // Obtenemos las celdas visibles para esta fila (depende de isDashboard)
                 const visibleCells = headCells.filter(cell => cell.id !== 'actions'); // Excluimos acciones aquí
                 
+                // Determinar el color de fondo de la fila según sea par o impar
+                const rowBackgroundColor = index % 2 === 0
+                  ? themeColors.surface.containerLowest
+                  : themeColors.surface.containerLow;
+                
                 return (
                   <TableRow 
                     key={animal.id}
                     sx={{
-                      bgcolor: index % 2 === 0 
-                        ? themeColors.surface.containerLowest
-                        : themeColors.surface.containerLow,
+                      bgcolor: rowBackgroundColor,
                       '&:hover': { 
                         bgcolor: themeColors.surface.containerHigh
                       },
@@ -317,34 +370,6 @@ const AnimalsTable = ({
                   >
                     {/* Mapear sobre las celdas definidas para generar las celdas del cuerpo */}
                     {visibleCells.map((cell) => {
-                      let cellContent;
-                      const key = cell.id as keyof (Animal | DashboardAnimal); // Clave para acceder a los datos
-
-                      if (cell.id === 'incidents') {
-                        const hasAnimalIncident = hasIncident(animal.incidents);
-                        cellContent = hasAnimalIncident ? (
-                          <Chip 
-                            label={animal.incidents} 
-                            sx={{
-                              backgroundColor: themeColors.error.container,
-                              color: themeColors.error.dark,
-                              fontWeight: 'bold',
-                              borderRadius: '4px',
-                              boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
-                              fontFamily: '"Roboto Mono", "Courier New", monospace'
-                            }}
-                            size="small"
-                          />
-                        ) : (
-                          <Typography variant="body2" sx={{ color: themeColors.text.secondary }}>Ninguna</Typography>
-                        );
-                      } else if (isDashboard && cell.id === 'farm_name') {
-                        cellContent = (animal as DashboardAnimal).farm_name;
-                      } else {
-                        // Acceder al valor usando la clave, asegurar que no sea undefined
-                        cellContent = animal[key] != null ? String(animal[key]) : '-'; 
-                      }
-
                       return (
                         <TableCell 
                           key={cell.id}
@@ -356,7 +381,7 @@ const AnimalsTable = ({
                             textOverflow: 'ellipsis' // Añadir puntos suspensivos si el contenido es muy largo
                           }}
                         >
-                          {cellContent}
+                          {renderCellContent(cell, animal)}
                         </TableCell>
                       );
                     })}

@@ -52,3 +52,20 @@ export default tseslint.config({
   },
 })
 ```
+
+## Tests
+
+El proyecto incluye tests unitarios y de integración utilizando Vitest y React Testing Library. Para ejecutar los tests:
+
+```bash
+# Ejecutar todos los tests
+npm run test
+
+# Ejecutar los tests en modo watch (para desarrollo)
+npm run test:watch
+
+# Generar informe de cobertura
+npm run test:coverage
+```
+
+Para más información sobre los tests, consulta la [documentación de tests](src/__tests__/README.md).

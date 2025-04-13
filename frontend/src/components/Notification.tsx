@@ -62,7 +62,7 @@ export const Notification = ({
         {itemsToRender.map((detail, index) => (
           <Typography 
             component="li" 
-            key={`detail-${index}`}
+            key={detail.field ? `detail-${detail.field}` : `detail-${detail.message || detail.toString()}-${index}`}
             variant="body2"
             sx={{
               display: 'flex',

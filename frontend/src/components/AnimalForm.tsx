@@ -10,10 +10,7 @@ import {
   Divider,
   Stack,
   IconButton,
-  Tooltip,
-  FormControl,
-  MenuItem,
-  Paper
+  Tooltip
 } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import { ErrorMessage } from './ErrorMessage';
@@ -59,8 +56,8 @@ const AnimalForm = memo(({
   farmId 
 }: AnimalFormProps) => {
   const [animalType, setAnimalType] = useState<string>('');
-  const [farmType, setFarmType] = useState<{id: number, name: string}>();
-  const [productionType, setProductionType] = useState<{id: number, name: string}>();
+  const [_, setFarmType] = useState<{id: number, name: string} | undefined>();
+  const [productionType, setProductionType] = useState<{id: number, name: string} | undefined>();
   const { id } = useParams<{ id: string }>();
   
   // Obtener el tipo de producción de la granja
