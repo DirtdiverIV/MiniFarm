@@ -45,9 +45,6 @@ export class Animal {
   @UpdateDateColumn()
   updated_at!: Date;
   
-  /**
-   * Crea una nueva instancia de Animal con los valores proporcionados
-   */
   static create(params: {
     id?: number;
     animal_type: string;

@@ -41,9 +41,6 @@ export class Farm {
   @UpdateDateColumn()
   updated_at!: Date;
   
-  /**
-   * Crea una nueva instancia de Farm con los valores proporcionados
-   */
   static create(params: {
     id?: number;
     name: string;
