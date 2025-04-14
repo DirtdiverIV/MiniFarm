@@ -1,3 +1,5 @@
+// sonarignore:start
+
 import { Farm } from '../../../models/Farm';
 import { FarmType } from '../../../models/FarmType';
 import { ProductionType } from '../../../models/ProductionType';
@@ -8,7 +10,7 @@ describe('Farm Model', () => {
     farm.id = 1;
     farm.name = 'Granja Los Álamos';
     
-    // Crear instancias de tipo de granja y tipo de producción
+    
     const farmType = new FarmType();
     farmType.id = 1;
     farmType.name = 'Ganadera';
@@ -17,7 +19,7 @@ describe('Farm Model', () => {
     productionType.id = 1;
     productionType.name = 'Láctea';
     
-    // Asignar tipos a la granja
+    
     farm.farm_type = farmType;
     farm.production_type = productionType;
     
@@ -33,28 +35,28 @@ describe('Farm Model', () => {
     farm.id = 1;
     farm.name = 'Granja Los Álamos';
     
-    // image_path es opcional (puede ser null)
+    
     expect(farm.image_path).toBeUndefined();
     
-    // Establecer un valor
+    
     farm.image_path = 'ruta/a/imagen.jpg';
     expect(farm.image_path).toBe('ruta/a/imagen.jpg');
     
-    // Establecer null
+    
     farm.image_path = null;
     expect(farm.image_path).toBeNull();
     
-    // provincia y municipio son opcionales (pueden ser null)
+    
     expect(farm.provincia).toBeUndefined();
     expect(farm.municipio).toBeUndefined();
     
-    // Establecer valores
+    
     farm.provincia = 'Córdoba';
     farm.municipio = 'Lucena';
     expect(farm.provincia).toBe('Córdoba');
     expect(farm.municipio).toBe('Lucena');
     
-    // Establecer null
+    
     farm.provincia = null;
     farm.municipio = null;
     expect(farm.provincia).toBeNull();
@@ -66,7 +68,7 @@ describe('Farm Model', () => {
     farm.id = 1;
     farm.name = 'Granja Los Álamos';
     
-    // Establecer fechas
+    
     const now = new Date();
     farm.created_at = now;
     farm.updated_at = now;
@@ -76,7 +78,7 @@ describe('Farm Model', () => {
   });
   
   it('debería crear una granja usando el método estático create', () => {
-    // Crear instancias de tipo de granja y tipo de producción
+    
     const farmType = FarmType.create({
       id: 1,
       name: 'Agrícola'
@@ -86,7 +88,7 @@ describe('Farm Model', () => {
     productionType.id = 1;
     productionType.name = 'Cereales';
     
-    // Crear una granja usando el método estático
+    
     const farm = Farm.create({
       id: 1,
       name: 'Granja El Rancho',
@@ -108,7 +110,7 @@ describe('Farm Model', () => {
   });
   
   it('debería crear una granja con valores opcionales nulos usando el método estático create', () => {
-    // Crear una granja con valores opcionales no especificados
+    
     const farm = Farm.create({
       name: 'Granja Mínima'
     });
@@ -122,3 +124,4 @@ describe('Farm Model', () => {
     expect(farm.municipio).toBeNull();
   });
 }); 
+// sonarignore:end

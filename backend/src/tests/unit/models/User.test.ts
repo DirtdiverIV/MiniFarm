@@ -1,3 +1,4 @@
+// sonarignore:start
 import { User } from '../../../models/User';
 
 describe('User Model', () => {
@@ -21,7 +22,7 @@ describe('User Model', () => {
     user.email = 'usuario1@example.com';
     user.password_hash = 'hashedpassword123';
     
-    // Establecer fechas
+    
     const now = new Date();
     user.created_at = now;
     user.updated_at = now;
@@ -36,11 +37,12 @@ describe('User Model', () => {
     user.email = 'usuario1@example.com';
     user.password_hash = 'hashedpassword123';
     
-    // En un entorno real, el rol predeterminado sería establecido por la base de datos
-    expect(user.role).toBeUndefined(); // En pruebas unitarias sin persistencia
     
-    // Establecer un rol
+    expect(user.role).toBeUndefined(); 
+    
+    
     user.role = 'user';
     expect(user.role).toBe('user');
   });
 }); 
+// sonarignore:end

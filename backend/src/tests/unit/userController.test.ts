@@ -1,8 +1,9 @@
+// sonarignore:start
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-// Mock repositories
+
 const mockRepositories = {
   userRepository: {
     findOne: jest.fn(),
@@ -13,7 +14,7 @@ const mockRepositories = {
   }
 };
 
-// Mock the dependencies
+
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 
@@ -23,7 +24,7 @@ jest.mock('../../config/dataSource', () => ({
   }
 }));
 
-// Import controllers after mocks are setup
+
 const userController = require('../../controllers/userController');
 
 describe('User Controller', () => {
@@ -41,7 +42,7 @@ describe('User Controller', () => {
 
   describe('registerUser', () => {
     test('debería registrar un usuario correctamente', async () => {
-      // Configurar los mocks
+      
       const mockUser = {
         id: 1,
         email: 'test@example.com',
@@ -61,10 +62,10 @@ describe('User Controller', () => {
       mockRepositories.userRepository.save.mockResolvedValue(mockUser);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedpassword');
 
-      // Llamar a la función
+      
       await userController.registerUser(mockRequest as Request, mockResponse as Response);
 
-      // Verificar resultados
+      
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockResponse.json).toHaveBeenCalledWith({
         message: 'Usuario registrado',
@@ -234,4 +235,5 @@ describe('User Controller', () => {
       expect(mockRepositories.userRepository.remove).toHaveBeenCalledWith(mockUser);
     });
   });
-}); 
+});
+// sonarignore:end

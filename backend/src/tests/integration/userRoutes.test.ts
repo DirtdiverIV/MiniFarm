@@ -1,3 +1,5 @@
+// sonarignore:start
+
 import request from 'supertest';
 import express from 'express';
 import bcrypt from 'bcrypt';
@@ -6,7 +8,7 @@ import { AppDataSource } from '../../config/dataSource';
 import { User } from '../../models/User';
 import { userRouter } from '../../routes/userRoutes';
 
-// Mock de las dependencias
+
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 jest.mock('../../config/dataSource', () => ({
@@ -21,10 +23,10 @@ jest.mock('../../config/dataSource', () => ({
   }
 }));
 
-// Mock del middleware de autenticación
+
 jest.mock('../../middlewares/authMiddleware', () => ({
   authMiddleware: (req: any, res: any, next: any) => {
-    // Simula que el usuario está autenticado
+    
     req.userId = 1;
     next();
   }
@@ -34,7 +36,7 @@ describe('User Routes', () => {
   let app: express.Application;
   
   beforeAll(() => {
-    // Configurar la aplicación Express
+    
     app = express();
     app.use(express.json());
     app.use('/api/users', userRouter);
@@ -159,3 +161,4 @@ describe('User Routes', () => {
     });
   });
 }); 
+// sonarignore:end

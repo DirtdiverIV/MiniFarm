@@ -1,24 +1,26 @@
-import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-import { AppDataSource } from '../config/dataSource';
-import { User } from '../models/User';
+import { AppDataSource } from "../config/dataSource";
+import { User } from "../models/User";
 
 const userRepository = AppDataSource.getRepository(User);
-const JWT_SECRET = process.env.JWT_SECRET === undefined ? 'default_secret' : process.env.JWT_SECRET;
+const JWT_SECRET =
+  process.env.JWT_SECRET === undefined
+    ? "default_secret"
+    : process.env.JWT_SECRET;
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
     const { email, password, role } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email y password son requeridos' });
+      return res.status(400).json({ error: "Email y password son requeridos" });
     }
 
-    // Verificar si el email ya existe
     const existingUser = await userRepository.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ error: 'El email ya está registrado' });
+      return res.status(400).json({ error: "El email ya está registrado" });
     }
 
     const saltRounds = 10;
@@ -27,22 +29,22 @@ export const registerUser = async (req: Request, res: Response) => {
     const newUser = userRepository.create({
       email,
       password_hash: passwordHash,
-      role: role === undefined ? 'user' : role
+      role: role === undefined ? "user" : role,
     });
 
     const savedUser = await userRepository.save(newUser);
 
     return res.status(201).json({
-      message: 'Usuario registrado',
+      message: "Usuario registrado",
       user: {
         id: savedUser.id,
         email: savedUser.email,
-        role: savedUser.role
-      }
+        role: savedUser.role,
+      },
     });
   } catch (error) {
-    console.error('Error registrando usuario:', error);
-    return res.status(500).json({ error: 'Error registrando usuario' });
+    console.error("Error registrando usuario:", error);
+    return res.status(500).json({ error: "Error registrando usuario" });
   }
 };
 
@@ -51,42 +53,48 @@ export const loginUser = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const user = await userRepository.findOne({ where: { email } });
     if (!user) {
-      return res.status(401).json({ error: 'Credenciales inválidas (usuario no existe)' });
+      return res
+        .status(401)
+        .json({ error: "Credenciales inválidas (usuario no existe)" });
     }
 
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) {
-      return res.status(401).json({ error: 'Credenciales inválidas (password errónea)' });
+      return res
+        .status(401)
+        .json({ error: "Credenciales inválidas (password errónea)" });
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
     return res.json({
-      message: 'Login exitoso',
+      message: "Login exitoso",
       token,
       user: {
         id: user.id,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
   } catch (error) {
-    console.error('Error en login:', error);
-    return res.status(500).json({ error: 'Error al iniciar sesión' });
+    console.error("Error en login:", error);
+    return res.status(500).json({ error: "Error al iniciar sesión" });
   }
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await userRepository.find();
-    const sanitized = users.map(u => ({
+    const sanitized = users.map((u) => ({
       id: u.id,
       email: u.email,
-      role: u.role
+      role: u.role,
     }));
     return res.json(sanitized);
   } catch (error) {
-    console.error('Error obteniendo usuarios:', error);
-    return res.status(500).json({ error: 'Error al obtener usuarios' });
+    console.error("Error obteniendo usuarios:", error);
+    return res.status(500).json({ error: "Error al obtener usuarios" });
   }
 };
 
@@ -97,7 +105,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
     const user = await userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
     if (email) user.email = email;
@@ -105,16 +113,16 @@ export const updateUser = async (req: Request, res: Response) => {
 
     const updatedUser = await userRepository.save(user);
     return res.json({
-      message: 'Usuario actualizado',
+      message: "Usuario actualizado",
       user: {
         id: updatedUser.id,
         email: updatedUser.email,
-        role: updatedUser.role
-      }
+        role: updatedUser.role,
+      },
     });
   } catch (error) {
-    console.error('Error actualizando usuario:', error);
-    return res.status(500).json({ error: 'Error al actualizar usuario' });
+    console.error("Error actualizando usuario:", error);
+    return res.status(500).json({ error: "Error al actualizar usuario" });
   }
 };
 
@@ -123,13 +131,13 @@ export const deleteUser = async (req: Request, res: Response) => {
     const userId = parseInt(req.params.id, 10);
     const user = await userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
     await userRepository.remove(user);
-    return res.json({ message: 'Usuario eliminado' });
+    return res.json({ message: "Usuario eliminado" });
   } catch (error) {
-    console.error('Error eliminando usuario:', error);
-    return res.status(500).json({ error: 'Error al eliminar usuario' });
+    console.error("Error eliminando usuario:", error);
+    return res.status(500).json({ error: "Error al eliminar usuario" });
   }
 };

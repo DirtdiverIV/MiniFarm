@@ -1,8 +1,10 @@
+// sonarignore:start
+
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { authMiddleware } from '../../../middlewares/authMiddleware';
 
-// Mock de jwt
+
 jest.mock('jsonwebtoken');
 
 describe('Auth Middleware', () => {
@@ -26,7 +28,7 @@ describe('Auth Middleware', () => {
   });
 
   test('debería llamar a next() cuando se proporciona un token válido', () => {
-    // Preparar
+    
     mockRequest.headers = {
       'authorization': 'Bearer valid_token'
     };
@@ -34,10 +36,10 @@ describe('Auth Middleware', () => {
     const mockPayload = { userId: 1 };
     (jwt.verify as jest.Mock).mockReturnValue(mockPayload);
 
-    // Ejecutar
+    
     authMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
 
-    // Verificar
+    
     expect(jwt.verify).toHaveBeenCalledWith('valid_token', expect.any(String));
     expect((mockRequest as any).userId).toBe(1);
     expect(nextFunction).toHaveBeenCalled();
@@ -46,13 +48,13 @@ describe('Auth Middleware', () => {
   });
 
   test('debería devolver 401 cuando no se proporciona el header de autorización', () => {
-    // Preparar
-    mockRequest.headers = {}; // Sin header de autorización
+    
+    mockRequest.headers = {}; 
 
-    // Ejecutar
+    
     authMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
 
-    // Verificar
+    
     expect(jwt.verify).not.toHaveBeenCalled();
     expect(nextFunction).not.toHaveBeenCalled();
     expect(mockResponse.status).toHaveBeenCalledWith(401);
@@ -60,15 +62,15 @@ describe('Auth Middleware', () => {
   });
 
   test('debería devolver 401 cuando el formato del token es inválido', () => {
-    // Preparar
+    
     mockRequest.headers = {
       'authorization': 'InvalidFormat'
     };
 
-    // Ejecutar
+    
     authMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
 
-    // Verificar
+    
     expect(jwt.verify).not.toHaveBeenCalled();
     expect(nextFunction).not.toHaveBeenCalled();
     expect(mockResponse.status).toHaveBeenCalledWith(401);
@@ -76,7 +78,7 @@ describe('Auth Middleware', () => {
   });
 
   test('debería devolver 403 cuando el token es inválido o ha expirado', () => {
-    // Preparar
+    
     mockRequest.headers = {
       'authorization': 'Bearer invalid_token'
     };
@@ -85,13 +87,14 @@ describe('Auth Middleware', () => {
       throw new Error('Token inválido o expirado');
     });
 
-    // Ejecutar
+    
     authMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
 
-    // Verificar
+    
     expect(jwt.verify).toHaveBeenCalledWith('invalid_token', expect.any(String));
     expect(nextFunction).not.toHaveBeenCalled();
     expect(mockResponse.status).toHaveBeenCalledWith(403);
     expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Token inválido o expirado' });
   });
 }); 
+// sonarignore:end

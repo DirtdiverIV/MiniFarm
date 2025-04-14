@@ -1,4 +1,4 @@
-// src/index.ts
+
 import 'reflect-metadata';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
@@ -19,7 +19,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Configurar para servir archivos estáticos desde la carpeta uploads
+
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use('/api/users', userRouter);

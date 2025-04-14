@@ -1,3 +1,4 @@
+// sonarignore:start
 import { FarmType } from '../../../models/FarmType';
 
 describe('FarmType Model', () => {
@@ -16,7 +17,7 @@ describe('FarmType Model', () => {
     farmType.id = 1;
     farmType.name = 'Ganadería';
     
-    // Establecer fechas
+    
     const now = new Date();
     farmType.created_at = now;
     farmType.updated_at = now;
@@ -26,7 +27,7 @@ describe('FarmType Model', () => {
   });
   
   it('debería crear un tipo de granja usando el método estático create con id', () => {
-    // Crear un tipo de granja usando el método estático
+    
     const farmType = FarmType.create({
       id: 2,
       name: 'Avícola'
@@ -38,7 +39,7 @@ describe('FarmType Model', () => {
   });
   
   it('debería crear un tipo de granja sin id usando el método estático create', () => {
-    // Crear un tipo de granja usando el método estático sin proporcionar un id
+    
     const farmType = FarmType.create({
       name: 'Porcina'
     });
@@ -48,3 +49,4 @@ describe('FarmType Model', () => {
     expect(farmType.name).toBe('Porcina');
   });
 }); 
+// sonarignore:end

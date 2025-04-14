@@ -1,3 +1,4 @@
+// sonarignore:start
 import { Animal } from '../../../models/Animal';
 import { Farm } from '../../../models/Farm';
 
@@ -23,13 +24,13 @@ describe('Animal Model', () => {
     animal.identification_number = 'VC-12345';
     animal.sanitary_register = 'SR-789123';
     
-    // Las propiedades opcionales deberían ser undefined inicialmente
+    
     expect(animal.weight).toBeUndefined();
     expect(animal.age).toBeUndefined();
     expect(animal.estimated_production).toBeUndefined();
     expect(animal.incidents).toBeUndefined();
     
-    // Establecer valores
+    
     animal.weight = 450.5;
     animal.age = 3;
     animal.estimated_production = 25.8;
@@ -40,7 +41,7 @@ describe('Animal Model', () => {
     expect(animal.estimated_production).toBe(25.8);
     expect(animal.incidents).toBe('Tratamiento antibiótico el 15/10/2023');
     
-    // Establecer null
+    
     animal.weight = null;
     animal.age = null;
     animal.estimated_production = null;
@@ -59,12 +60,12 @@ describe('Animal Model', () => {
     animal.identification_number = 'VC-12345';
     animal.sanitary_register = 'SR-789123';
     
-    // Crear una granja
+    
     const farm = new Farm();
     farm.id = 1;
     farm.name = 'Granja Los Álamos';
     
-    // Asignar la granja al animal
+    
     animal.farm = farm;
     
     expect(animal.farm).toBe(farm);
@@ -79,7 +80,7 @@ describe('Animal Model', () => {
     animal.identification_number = 'VC-12345';
     animal.sanitary_register = 'SR-789123';
     
-    // Establecer fechas
+    
     const now = new Date();
     animal.created_at = now;
     animal.updated_at = now;
@@ -89,13 +90,13 @@ describe('Animal Model', () => {
   });
   
   it('debería crear un animal usando el método estático create', () => {
-    // Crear una granja
+    
     const farm = Farm.create({
       id: 1,
       name: 'Granja Test'
     });
     
-    // Crear un animal usando el método estático
+    
     const animal = Animal.create({
       id: 1,
       animal_type: 'Oveja',
@@ -121,7 +122,7 @@ describe('Animal Model', () => {
   });
   
   it('debería crear un animal con valores opcionales nulos usando el método estático create', () => {
-    // Crear un animal con valores opcionales no especificados
+    
     const animal = Animal.create({
       animal_type: 'Cabra',
       identification_number: 'CB-12345',
@@ -137,3 +138,4 @@ describe('Animal Model', () => {
     expect(animal.farm).toBeUndefined();
   });
 }); 
+// sonarignore:end

@@ -1,3 +1,4 @@
+// sonarignore:start
 import { ProductionType } from '../../../models/ProductionType';
 
 describe('ProductionType Model', () => {
@@ -15,8 +16,7 @@ describe('ProductionType Model', () => {
     const productionType = new ProductionType();
     productionType.id = 1;
     productionType.name = 'Cárnica';
-    
-    // Establecer fechas
+
     const now = new Date();
     productionType.created_at = now;
     productionType.updated_at = now;
@@ -25,3 +25,4 @@ describe('ProductionType Model', () => {
     expect(productionType.updated_at).toEqual(now);
   });
 }); 
+// sonarignore:end

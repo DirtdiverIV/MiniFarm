@@ -1,6 +1,7 @@
+// sonarignore:start
 import { Request, Response } from 'express';
 
-// Mock repositories
+
 const mockRepositories = {
   animalRepository: {
     create: jest.fn(),
@@ -14,7 +15,7 @@ const mockRepositories = {
   }
 };
 
-// Mock the dataSource before importing controllers
+
 jest.mock('../../config/dataSource', () => ({
   AppDataSource: {
     getRepository: jest.fn((entity) => {
@@ -29,7 +30,7 @@ jest.mock('../../config/dataSource', () => ({
   }
 }));
 
-// Mock the models
+
 jest.mock('../../models/Animal', () => ({
   Animal: { name: 'Animal' }
 }));
@@ -38,7 +39,7 @@ jest.mock('../../models/Farm', () => ({
   Farm: { name: 'Farm' }
 }));
 
-// Import controllers after mocks are setup
+
 const animalController = require('../../controllers/animalController');
 
 describe('Animal Controller', () => {
@@ -188,3 +189,4 @@ describe('Animal Controller', () => {
     });
   });
 }); 
+// sonarignore:end

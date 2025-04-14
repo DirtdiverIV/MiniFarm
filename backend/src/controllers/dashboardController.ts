@@ -11,20 +11,20 @@ const productionTypeRepository = AppDataSource.getRepository(ProductionType);
 
 export const getDashboardStats = async (req: Request, res: Response) => {
   try {
-    // Obtener el total de animales
+    
     const totalAnimals = await animalRepository.count();
 
-    // Obtener todas las granjas con sus tipos de producción
+    
     const farms = await farmRepository.find({
       relations: ['production_type']
     });
 
-    // Obtener los tipos de producción
+    
     const productionTypes = await productionTypeRepository.find();
     const carneType = productionTypes.find(pt => pt.name === 'Cárnica');
     const lecheType = productionTypes.find(pt => pt.name === 'Láctea');
 
-    // Calcular producción estimada de carne
+    
     const carneFarms = farms.filter(farm => farm.production_type?.id === carneType?.id);
     const carneAnimals = await animalRepository.find({
       where: carneFarms.map(farm => ({ farm: { id: farm.id } }))
@@ -32,7 +32,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     const totalCarneProduction = carneAnimals.reduce((sum, animal) => 
       sum + (animal.estimated_production ?? 0), 0);
 
-    // Calcular producción estimada de leche
+    
     const lecheFarms = farms.filter(farm => farm.production_type?.id === lecheType?.id);
     const lecheAnimals = await animalRepository.find({
       where: lecheFarms.map(farm => ({ farm: { id: farm.id } }))
@@ -40,7 +40,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     const totalLecheProduction = lecheAnimals.reduce((sum, animal) => 
       sum + (animal.estimated_production ?? 0), 0);
 
-    // Obtener animales con incidencias
+    
     const animalsWithIncidents = await animalRepository.find({
       where: {
         incidents: Not(IsNull())

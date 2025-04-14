@@ -1,11 +1,13 @@
+// sonarignore:start
+
 import request from 'supertest';
 import express from 'express';
 
-// Mock de las funciones individuales
+
 const mockFarmTypeFind = jest.fn();
 const mockProductionTypeFind = jest.fn();
 
-// Mock de las dependencias
+
 jest.mock('../../config/dataSource', () => ({
   AppDataSource: {
     getRepository: jest.fn().mockImplementation((entity) => {
@@ -25,7 +27,7 @@ jest.mock('../../config/dataSource', () => ({
   }
 }));
 
-// Mock de los modelos para evitar referencias circulares
+
 jest.mock('../../models/FarmType', () => ({
   FarmType: { name: 'FarmType' }
 }));
@@ -34,7 +36,7 @@ jest.mock('../../models/ProductionType', () => ({
   ProductionType: { name: 'ProductionType' }
 }));
 
-// Importar las rutas después de los mocks
+
 const typeRouter = require('../../routes/typeRoutes').typeRouter;
 
 describe('Type Routes', () => {
@@ -42,20 +44,20 @@ describe('Type Routes', () => {
   let consoleErrorSpy: jest.SpyInstance;
   
   beforeAll(() => {
-    // Configurar la aplicación Express
+    
     app = express();
     app.use(express.json());
     app.use('/api/types', typeRouter);
   });
 
   beforeEach(() => {
-    // Silenciar errores de consola
+    
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.clearAllMocks();
   });
 
   afterEach(() => {
-    // Restaurar console.error después de cada prueba
+    
     consoleErrorSpy.mockRestore();
   });
 
@@ -117,3 +119,4 @@ describe('Type Routes', () => {
     });
   });
 }); 
+// sonarignore:end

@@ -1,14 +1,15 @@
+// sonarignore:start
 import request from 'supertest';
 import express from 'express';
 
-// Mock de las funciones individuales
+
 const mockCreate = jest.fn();
 const mockSave = jest.fn();
 const mockFind = jest.fn();
 const mockFindOne = jest.fn();
 const mockRemove = jest.fn();
 
-// Mock de las dependencias
+
 jest.mock('../../config/dataSource', () => ({
   AppDataSource: {
     getRepository: jest.fn().mockImplementation((entity) => {
@@ -27,21 +28,21 @@ jest.mock('../../config/dataSource', () => ({
   }
 }));
 
-// Mock de los modelos para evitar referencias circulares
+
 jest.mock('../../models/ProductionType', () => ({
   ProductionType: { name: 'ProductionType' }
 }));
 
-// Mock del middleware de autenticación
+
 jest.mock('../../middlewares/authMiddleware', () => ({
   authMiddleware: (req: any, res: any, next: any) => {
-    // Simula que el usuario está autenticado
+    
     req.userId = 1;
     next();
   }
 }));
 
-// Importar las rutas después de los mocks
+
 const productionTypeRouter = require('../../routes/productionTypeRoutes').productionTypeRouter;
 
 describe('Production Type Routes', () => {
@@ -49,20 +50,20 @@ describe('Production Type Routes', () => {
   let consoleErrorSpy: jest.SpyInstance;
   
   beforeAll(() => {
-    // Configurar la aplicación Express
+    
     app = express();
     app.use(express.json());
     app.use('/api/production-types', productionTypeRouter);
   });
 
   beforeEach(() => {
-    // Silenciar errores de consola
+    
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.clearAllMocks();
   });
 
   afterEach(() => {
-    // Restaurar console.error después de cada prueba
+    
     consoleErrorSpy.mockRestore();
   });
 
@@ -213,4 +214,5 @@ describe('Production Type Routes', () => {
       expect(response.body).toHaveProperty('error', 'Tipo de producción no encontrado');
     });
   });
-}); 
+});
+// sonarignore:end

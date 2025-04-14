@@ -1,6 +1,7 @@
+// sonarignore:start
 import { Request, Response } from 'express';
 
-// Mocks de los repositorios
+
 const mockAnimalRepository = {
   count: jest.fn(),
   find: jest.fn()
@@ -14,13 +15,13 @@ const mockProductionTypeRepository = {
   find: jest.fn()
 };
 
-// Mock de typeorm
+
 jest.mock('typeorm', () => ({
   Not: jest.fn().mockImplementation(value => ({ value, _type: 'not' })),
   IsNull: jest.fn().mockImplementation(() => ({ _type: 'isnull' }))
 }));
 
-// Mock de las dependencias
+
 jest.mock('../../config/dataSource', () => ({
   AppDataSource: {
     getRepository: jest.fn().mockImplementation((entity) => {
@@ -39,7 +40,7 @@ jest.mock('../../config/dataSource', () => ({
   }
 }));
 
-// Mock de los modelos
+
 jest.mock('../../models/Animal', () => ({
   Animal: { name: 'Animal' }
 }));
@@ -52,7 +53,7 @@ jest.mock('../../models/ProductionType', () => ({
   ProductionType: { name: 'ProductionType' }
 }));
 
-// Importar el controlador después de todos los mocks
+
 import * as dashboardController from '../../controllers/dashboardController';
 
 describe('Dashboard Controller', () => {
@@ -70,7 +71,7 @@ describe('Dashboard Controller', () => {
 
   describe('getDashboardStats', () => {
     test('debería obtener estadísticas correctamente', async () => {
-      // Configurar datos de prueba
+      
       const mockTotalAnimals = 10;
       
       const mockProductionTypes = [
@@ -103,12 +104,12 @@ describe('Dashboard Controller', () => {
         }
       ];
 
-      // Configurar comportamiento de los mocks
+      
       mockAnimalRepository.count.mockResolvedValue(mockTotalAnimals);
       mockProductionTypeRepository.find.mockResolvedValue(mockProductionTypes);
       mockFarmRepository.find.mockResolvedValue(mockFarms);
       
-      // Configurar mock para find con diferentes parámetros
+      
       mockAnimalRepository.find.mockImplementation((params: any) => {
         const hasValidWhereClause = params?.where && Array.isArray(params.where) && params.where.length > 0;
         if (hasValidWhereClause) {
@@ -124,21 +125,21 @@ describe('Dashboard Controller', () => {
         return Promise.resolve([]);
       });
 
-      // Ejecutar el controlador
+      
       await dashboardController.getDashboardStats(mockRequest as unknown as Request, mockResponse as unknown as Response);
 
-      // Verificar que se llamen los métodos correctos
+      
       expect(mockAnimalRepository.count).toHaveBeenCalled();
       expect(mockFarmRepository.find).toHaveBeenCalledWith({
         relations: ['production_type']
       });
       expect(mockProductionTypeRepository.find).toHaveBeenCalled();
       
-      // Verificar que la respuesta es correcta
+      
       expect(mockResponse.json).toHaveBeenCalledWith({
         total_animals: mockTotalAnimals,
-        total_carne_production: 250, // 100 + 150
-        total_leche_production: 450, // 200 + 250
+        total_carne_production: 250, 
+        total_leche_production: 450, 
         animals_with_incidents: [
           {
             id: 5,
@@ -154,7 +155,7 @@ describe('Dashboard Controller', () => {
     test('debería manejar errores correctamente', async () => {
       mockAnimalRepository.count.mockRejectedValue(new Error('Error de base de datos'));
       await dashboardController.getDashboardStats(mockRequest as unknown as Request, mockResponse as unknown as Response);
-      // Verificar resultados
+      
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({
         error: 'Error al obtener estadísticas del dashboard'
@@ -162,3 +163,4 @@ describe('Dashboard Controller', () => {
     });
   });
 }); 
+// sonarignore:end

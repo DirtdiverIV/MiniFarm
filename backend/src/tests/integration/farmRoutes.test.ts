@@ -1,7 +1,8 @@
+// sonarignore:start
 import request from 'supertest';
 import express from 'express';
 
-// Mock de las funciones individuales
+
 const mockCreate = jest.fn();
 const mockSave = jest.fn();
 const mockFind = jest.fn();
@@ -11,10 +12,10 @@ const mockDelete = jest.fn();
 const mockFarmTypeFind = jest.fn();
 const mockProductionTypeFind = jest.fn();
 
-// Mock del middleware de carga de archivos
+
 jest.mock('../../middlewares/uploadMiddleware', () => ({
   uploadFarmImage: (req: any, res: any, next: any) => {
-    // Si se proporciona un archivo en la llamada de prueba, usarlo
+    
     if (req.body.mockFile) {
       req.file = { 
         filename: 'test-image.jpg',
@@ -27,13 +28,13 @@ jest.mock('../../middlewares/uploadMiddleware', () => ({
   handleMulterError: (err: any, req: any, res: any, next: any) => next()
 }));
 
-// Mock de fs
+
 jest.mock('fs', () => ({
   unlinkSync: jest.fn(),
   existsSync: jest.fn().mockImplementation(() => true)
 }));
 
-// Mock de las dependencias
+
 jest.mock('../../config/dataSource', () => ({
   AppDataSource: {
     getRepository: jest.fn().mockImplementation((entity) => {
@@ -67,7 +68,7 @@ jest.mock('../../config/dataSource', () => ({
   }
 }));
 
-// Mock de los modelos para evitar referencias circulares
+
 jest.mock('../../models/Farm', () => ({
   Farm: { name: 'Farm' }
 }));
@@ -84,16 +85,16 @@ jest.mock('../../models/Animal', () => ({
   Animal: { name: 'Animal' }
 }));
 
-// Mock del middleware de autenticación
+
 jest.mock('../../middlewares/authMiddleware', () => ({
   authMiddleware: (req: any, res: any, next: any) => {
-    // Simula que el usuario está autenticado
+    
     req.userId = 1;
     next();
   }
 }));
 
-// Importar las rutas después de los mocks
+
 const farmRouter = require('../../routes/farmRoutes').farmRouter;
 
 describe('Farm Routes', () => {
@@ -101,20 +102,20 @@ describe('Farm Routes', () => {
   let consoleErrorSpy: jest.SpyInstance;
   
   beforeAll(() => {
-    // Configurar la aplicación Express
+    
     app = express();
     app.use(express.json());
     app.use('/api/farms', farmRouter);
   });
 
   beforeEach(() => {
-    // Silenciar errores de consola
+    
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.clearAllMocks();
   });
 
   afterEach(() => {
-    // Restaurar console.error después de cada prueba
+    
     consoleErrorSpy.mockRestore();
   });
 
@@ -244,7 +245,7 @@ describe('Farm Routes', () => {
           name: 'Granja Test',
           farm_type_id: 1,
           production_type_id: 1,
-          mockFile: true // Trigger para el middleware mock
+          mockFile: true 
         });
 
       expect(response.status).toBe(201);
@@ -357,4 +358,5 @@ describe('Farm Routes', () => {
       expect(response.body).toHaveProperty('error', 'Granja no encontrada');
     });
   });
-}); 
+});
+// sonarignore:end
