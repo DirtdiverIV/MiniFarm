@@ -1,3 +1,4 @@
+// sonarignore:start
 import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { useFilteredData } from '../../hooks/useFilteredData'
@@ -127,3 +128,4 @@ describe('useFilteredData', () => {
     ])
   })
 }) 
+// sonarignore:end

@@ -1,6 +1,6 @@
 import { api } from './api';
 
-// Tipos de datos
+
 export interface Farm {
   id: number;
   name: string;
@@ -35,21 +35,21 @@ export interface FarmUpdateData {
   image?: File;
 }
 
-// Función para obtener todas las granjas
+
 export const getAllFarms = async (): Promise<Farm[]> => {
   const response = await api.get<Farm[]>('/farms');
   return response.data;
 };
 
-// Función para obtener una granja por ID
+
 export const getFarmById = async (id: number): Promise<Farm> => {
   const response = await api.get<Farm>(`/farms/${id}`);
   return response.data;
 };
 
-// Función para crear una granja nueva
+
 export const createFarm = async (farmData: FarmCreateData): Promise<Farm> => {
-  // Usar FormData para poder enviar la imagen
+  
   const formData = new FormData();
   formData.append('name', farmData.name);
   formData.append('farm_type_id', farmData.farm_type_id.toString());
@@ -70,9 +70,9 @@ export const createFarm = async (farmData: FarmCreateData): Promise<Farm> => {
   return response.data.farm;
 };
 
-// Función para actualizar una granja
+
 export const updateFarm = async (id: number, farmData: FarmUpdateData): Promise<Farm> => {
-  // Usar FormData para poder enviar la imagen
+  
   const formData = new FormData();
   
   if (farmData.name) {
@@ -108,7 +108,7 @@ export const updateFarm = async (id: number, farmData: FarmUpdateData): Promise<
   return response.data.farm;
 };
 
-// Función para eliminar una granja
+
 export const deleteFarm = async (id: number): Promise<void> => {
   await api.delete(`/farms/${id}`);
 }; 

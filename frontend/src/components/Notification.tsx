@@ -39,7 +39,7 @@ export const Notification = ({
     onClose();
   };
   
-  // Si hay error, usar sus datos
+  
   const errorDetails = error?.details || null;
   const errorMessage = error?.message || message;
   const errorSeverity = error ? 'error' : severity;
@@ -120,7 +120,7 @@ export const Notification = ({
     </Alert>
   );
   
-  // Mostrar como Snackbar o como Collapse según el caso de uso
+  
   return isSnackbar ? (
     <Snackbar
       open={internalOpen}
