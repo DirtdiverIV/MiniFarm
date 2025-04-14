@@ -8,6 +8,8 @@ El backend de MiniFarm está construido con Node.js y Express, utilizando TypeSc
 - **Controladores**: Contienen la lógica de negocio y manejan las peticiones HTTP
 - **Rutas**: Definen los endpoints de la API REST
 - **Middlewares**: Implementan funcionalidades transversales como autenticación y validación
+- **Servicios**: Contienen lógica de negocio reutilizable
+- **Dashboard**: Proporciona estadísticas y métricas del sistema
 
 ## Estructura del Proyecto
 
@@ -19,7 +21,7 @@ El backend de MiniFarm está construido con Node.js y Express, utilizando TypeSc
     /middlewares    # Middleware para autenticación, validación, etc.
     /models         # Entidades/modelos de datos
     /routes         # Definición de rutas API
-    /types          # Tipos personalizados y definiciones de interfaces
+    /services       # Servicios reutilizables
     /tests          # Tests unitarios e integración
     index.ts        # Punto de entrada de la aplicación
     seed.ts         # Script para poblar la base de datos
@@ -30,10 +32,18 @@ El backend de MiniFarm está construido con Node.js y Express, utilizando TypeSc
 
 ## Base de Datos
 
-El backend utiliza PostgreSQL como sistema de gestión de base de datos relacional. La conexión y el mapeo objeto-relacional se manejan mediante TypeORM, que proporciona una capa de abstracción para interactuar con la base de datos.
+El backend utiliza PostgreSQL como sistema de gestión de base de datos relacional, alojado en Neon.tech. La conexión y el mapeo objeto-relacional se manejan mediante TypeORM, que proporciona una capa de abstracción para interactuar con la base de datos.
 
-TypeORM está configurado para conectarse a una base de datos PostgreSQL en la nube proporcionada para la prueba técnica, usando una cadena de conexión guardada en las variables de entorno.
+TypeORM está configurado para conectarse a la base de datos PostgreSQL en la nube usando la cadena de conexión proporcionada en las variables de entorno.
 
 ## Autenticación y Seguridad
 
-El sistema implementa autenticación basada en JSON Web Tokens (JWT) para proteger las rutas sensibles. Las contraseñas se almacenan de forma segura utilizando bcrypt para el hash. 
+El sistema implementa autenticación basada en JSON Web Tokens (JWT) para proteger las rutas sensibles. Las contraseñas se almacenan de forma segura utilizando bcrypt para el hash. Se implementan roles de usuario (admin/user) para control de acceso.
+
+## Dashboard y Estadísticas
+
+El sistema incluye un dashboard que proporciona:
+- Estadísticas generales de granjas y animales
+- Métricas de producción por tipo
+- Distribución geográfica de las granjas
+- Alertas y notificaciones de incidencias 

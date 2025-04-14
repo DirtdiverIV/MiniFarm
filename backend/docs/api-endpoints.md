@@ -2,44 +2,27 @@
 
 El backend de MiniFarm expone los siguientes endpoints RESTful:
 
-## Usuarios
+## Autenticación
 
 | Método | Ruta | Descripción | Autenticación |
 |--------|------|-------------|---------------|
 | POST | `/api/users/register` | Registra un nuevo usuario | No |
 | POST | `/api/users/login` | Inicia sesión y retorna un token JWT | No |
-| GET | `/api/users/profile` | Obtiene el perfil del usuario actual | Sí |
-| PUT | `/api/users/profile` | Actualiza el perfil del usuario actual | Sí |
 
-### Ejemplo de Registro
+## Usuarios
 
-```
-POST /api/users/register
-Content-Type: application/json
-
-{
-  "email": "usuario@ejemplo.com",
-  "password": "contraseña123"
-}
-```
-
-### Ejemplo de Login
-
-```
-POST /api/users/login
-Content-Type: application/json
-
-{
-  "email": "usuario@ejemplo.com",
-  "password": "contraseña123"
-}
-```
+| Método | Ruta | Descripción | Autenticación |
+|--------|------|-------------|---------------|
+| GET | `/api/users` | Obtiene todos los usuarios | Sí (Admin) |
+| GET | `/api/users/:id` | Obtiene un usuario por ID | Sí (Admin) |
+| PUT | `/api/users/:id` | Actualiza un usuario | Sí (Admin) |
+| DELETE | `/api/users/:id` | Elimina un usuario | Sí (Admin) |
 
 ## Granjas
 
 | Método | Ruta | Descripción | Autenticación |
 |--------|------|-------------|---------------|
-| GET | `/api/farms` | Obtiene todas las granjas del usuario | Sí |
+| GET | `/api/farms` | Obtiene todas las granjas | Sí |
 | GET | `/api/farms/:id` | Obtiene una granja por ID | Sí |
 | POST | `/api/farms` | Crea una nueva granja | Sí |
 | PUT | `/api/farms/:id` | Actualiza una granja existente | Sí |
@@ -47,47 +30,14 @@ Content-Type: application/json
 
 ### Ejemplo de Creación de Granja (JSON)
 
-```
-POST /api/farms
-Content-Type: application/json
-Authorization: Bearer <token_jwt>
-
+```json
 {
-  "name": "Mi Granja",
-  "description": "Una descripción de mi granja",
-  "location": "Ubicación",
-  "farm_type_id": 1
+  "name": "Finca Vacuna La Campiña",
+  "farm_type_id": 1,
+  "production_type_id": 1,
+  "provincia": "Sevilla",
+  "municipio": "Dos Hermanas"
 }
-```
-
-### Ejemplo de Creación de Granja con Imagen (FormData)
-
-```
-POST /api/farms
-Content-Type: multipart/form-data
-Authorization: Bearer <token_jwt>
-
-Form data:
-  name: Mi Granja
-  description: Una descripción de mi granja
-  location: Ubicación
-  farm_type_id: 1
-  image: [archivo de imagen]
-```
-
-### Ejemplo de Actualización de Granja con Imagen
-
-```
-PUT /api/farms/:id
-Content-Type: multipart/form-data
-Authorization: Bearer <token_jwt>
-
-Form data:
-  name: Mi Granja Actualizada
-  description: Una nueva descripción
-  location: Nueva Ubicación
-  farm_type_id: 2
-  image: [archivo de imagen]
 ```
 
 ## Animales
@@ -95,38 +45,22 @@ Form data:
 | Método | Ruta | Descripción | Autenticación |
 |--------|------|-------------|---------------|
 | GET | `/api/animals` | Obtiene todos los animales | Sí |
+| GET | `/api/animals/farm/:farmId` | Obtiene animales por granja | Sí |
 | GET | `/api/animals/:id` | Obtiene un animal por ID | Sí |
 | POST | `/api/animals` | Registra un nuevo animal | Sí |
 | PUT | `/api/animals/:id` | Actualiza un animal existente | Sí |
 | DELETE | `/api/animals/:id` | Elimina un animal | Sí |
 
-### Ejemplo de Registro de Animal (JSON)
+### Ejemplo de Registro de Animal
 
-```
-POST /api/animals
-Content-Type: application/json
-Authorization: Bearer <token_jwt>
-
+```json
 {
-  "name": "Nombre del Animal",
-  "birth_date": "2023-01-01",
-  "breed": "Raza",
-  "farm_id": 1,
-  "production_type_id": 2
-}
-```
-
-### Ejemplo de Actualización de Animal
-
-```
-PUT /api/animals/:id
-Content-Type: application/json
-Authorization: Bearer <token_jwt>
-
-{
-  "name": "Nuevo Nombre del Animal",
-  "birth_date": "2023-01-01",
-  "breed": "Nueva Raza"
+  "animal_type": "Vaca",
+  "identification_number": "VAC001",
+  "weight": 500,
+  "sanitary_register": "SR001",
+  "age": 3,
+  "farm_id": 1
 }
 ```
 
@@ -134,27 +68,30 @@ Authorization: Bearer <token_jwt>
 
 | Método | Ruta | Descripción | Autenticación |
 |--------|------|-------------|---------------|
-| GET | `/api/types/farm` | Obtiene todos los tipos de granja | Sí |
-| GET | `/api/types/farm/:id` | Obtiene un tipo de granja por ID | Sí |
-| POST | `/api/types/farm` | Crea un nuevo tipo de granja | Sí (Admin) |
-| PUT | `/api/types/farm/:id` | Actualiza un tipo de granja | Sí (Admin) |
-| DELETE | `/api/types/farm/:id` | Elimina un tipo de granja | Sí (Admin) |
+| GET | `/api/farm-types` | Obtiene todos los tipos de granja | Sí |
+| GET | `/api/farm-types/:id` | Obtiene un tipo de granja por ID | Sí |
+| POST | `/api/farm-types` | Crea un nuevo tipo de granja | Sí (Admin) |
+| PUT | `/api/farm-types/:id` | Actualiza un tipo de granja | Sí (Admin) |
+| DELETE | `/api/farm-types/:id` | Elimina un tipo de granja | Sí (Admin) |
 
 ## Tipos de Producción
 
 | Método | Ruta | Descripción | Autenticación |
 |--------|------|-------------|---------------|
-| GET | `/api/types/production` | Obtiene todos los tipos de producción | Sí |
-| GET | `/api/types/production/:id` | Obtiene un tipo de producción por ID | Sí |
-| POST | `/api/types/production` | Crea un nuevo tipo de producción | Sí (Admin) |
-| PUT | `/api/types/production/:id` | Actualiza un tipo de producción | Sí (Admin) |
-| DELETE | `/api/types/production/:id` | Elimina un tipo de producción | Sí (Admin) |
+| GET | `/api/production-types` | Obtiene todos los tipos de producción | Sí |
+| GET | `/api/production-types/:id` | Obtiene un tipo de producción por ID | Sí |
+| POST | `/api/production-types` | Crea un nuevo tipo de producción | Sí (Admin) |
+| PUT | `/api/production-types/:id` | Actualiza un tipo de producción | Sí (Admin) |
+| DELETE | `/api/production-types/:id` | Elimina un tipo de producción | Sí (Admin) |
 
 ## Dashboard
 
 | Método | Ruta | Descripción | Autenticación |
 |--------|------|-------------|---------------|
-| GET | `/api/dashboard/stats` | Obtiene estadísticas generales del usuario | Sí |
+| GET | `/api/dashboard/stats` | Obtiene estadísticas generales | Sí |
+| GET | `/api/dashboard/farms` | Obtiene estadísticas de granjas | Sí |
+| GET | `/api/dashboard/animals` | Obtiene estadísticas de animales | Sí |
+| GET | `/api/dashboard/production` | Obtiene estadísticas de producción | Sí |
 
 ## Acceso a Imágenes
 

@@ -42,22 +42,28 @@ export class Farm {
   @Column({ type: 'varchar' })
   name!: string;
   
-  @Column({ type: 'text', nullable: true })
-  description?: string;
-  
-  @Column({ type: 'varchar', nullable: true })
-  location?: string;
-  
-  @Column({ type: 'varchar', nullable: true })
-  image?: string;
-  
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'user_id' })
-  user!: User;
-  
   @ManyToOne(() => FarmType)
   @JoinColumn({ name: 'farm_type_id' })
   farm_type!: FarmType;
+
+  @ManyToOne(() => ProductionType)
+  @JoinColumn({ name: 'production_type_id' })
+  production_type!: ProductionType;
+
+  @Column({ type: 'varchar', nullable: true })
+  image_path!: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  provincia!: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  municipio!: string | null;
+  
+  @CreateDateColumn()
+  created_at!: Date;
+  
+  @UpdateDateColumn()
+  updated_at!: Date;
 }
 ```
 
@@ -72,24 +78,35 @@ export class Animal {
   id!: number;
   
   @Column({ type: 'varchar' })
-  name!: string;
+  animal_type!: string;
   
-  @Column({ type: 'date' })
-  birth_date!: Date;
+  @Column({ type: 'varchar' })
+  identification_number!: string;
   
-  @Column({ type: 'varchar', nullable: true })
-  breed?: string;
+  @Column({ type: 'float', nullable: true })
+  weight!: number | null;
   
-  @Column({ type: 'varchar', nullable: true })
-  image?: string;
+  @Column({ type: 'float', nullable: true })
+  estimated_production!: number | null;
+  
+  @Column({ type: 'varchar' })
+  sanitary_register!: string;
+  
+  @Column({ type: 'int', nullable: true })
+  age!: number | null;
+  
+  @Column({ type: 'text', nullable: true })
+  incidents!: string | null;
   
   @ManyToOne(() => Farm)
   @JoinColumn({ name: 'farm_id' })
   farm!: Farm;
   
-  @ManyToOne(() => ProductionType)
-  @JoinColumn({ name: 'production_type_id' })
-  production_type!: ProductionType;
+  @CreateDateColumn()
+  created_at!: Date;
+  
+  @UpdateDateColumn()
+  updated_at!: Date;
 }
 ```
 
@@ -106,8 +123,11 @@ export class FarmType {
   @Column({ type: 'varchar', unique: true })
   name!: string;
   
-  @Column({ type: 'text', nullable: true })
-  description?: string;
+  @CreateDateColumn()
+  created_at!: Date;
+  
+  @UpdateDateColumn()
+  updated_at!: Date;
 }
 ```
 
@@ -124,13 +144,17 @@ export class ProductionType {
   @Column({ type: 'varchar', unique: true })
   name!: string;
   
-  @Column({ type: 'text', nullable: true })
-  description?: string;
+  @CreateDateColumn()
+  created_at!: Date;
+  
+  @UpdateDateColumn()
+  updated_at!: Date;
 }
 ```
 
 ## Relaciones entre Modelos
 
 - Un **Usuario** puede tener múltiples **Granjas**
-- Una **Granja** pertenece a un **Usuario** y tiene un **Tipo de Granja**
-- Un **Animal** pertenece a una **Granja** y tiene un **Tipo de Producción** 
+- Una **Granja** tiene un **Tipo de Granja** y un **Tipo de Producción**
+- Un **Animal** pertenece a una **Granja**
+- Los **Tipos de Granja** y **Tipos de Producción** son entidades independientes 
