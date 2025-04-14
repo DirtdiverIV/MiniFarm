@@ -1,4 +1,4 @@
-import { createTheme, alpha } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 
 // Crear un array de sombras estándar de MUI
 const shadows = [
@@ -153,7 +153,7 @@ const theme = createTheme({
       contrastText: themeColors.tertiary.contrastText,
     },
     success: {
-      main: themeColors.primary.main, // Usando primary como success para mantener coherencia del tema
+      main: themeColors.primary.main, 
       light: themeColors.primary.light,
       dark: themeColors.primary.dark,
       contrastText: themeColors.primary.contrastText,

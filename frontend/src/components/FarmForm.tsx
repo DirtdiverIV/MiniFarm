@@ -15,12 +15,12 @@ import { Formik, Form, Field, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { ErrorMessage } from './ErrorMessage';
 
-// Importar hooks personalizados
+
 import { useFormHandling } from '../hooks/useFormHandling';
 import { useFormTypes } from '../hooks/useFormTypes';
 import { useImagePreview } from '../hooks/useImagePreview';
 
-// Interfaces
+
 interface FarmFormProps {
   onSubmit: (values: FarmFormValues) => Promise<void>;
   initialValues?: FarmFormValues;
@@ -36,7 +36,7 @@ export interface FarmFormValues {
   image?: File | null;
 }
 
-// Esquema de validación
+
 const FarmFormSchema = Yup.object().shape({
   name: Yup.string()
     .required('El nombre es obligatorio')
@@ -55,7 +55,7 @@ const FarmFormSchema = Yup.object().shape({
 });
 
 const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormProps) => {
-  // Valores iniciales por defecto
+  
   const defaultValues: FarmFormValues = {
     name: '',
     farm_type_id: 0,
@@ -65,10 +65,10 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
     image: null
   };
 
-  // Estado para el código de provincia seleccionada
+  
   const [selectedProvinciaCode, setSelectedProvinciaCode] = useState<string | null>(null);
 
-  // Hooks personalizados
+  
   const { 
     farmTypes, 
     productionTypes, 
@@ -89,16 +89,16 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
     }
   });
 
-  // Envolver el handleSubmit para depurar los valores
+  
   const handleSubmit = async (values: FarmFormValues, formikHelpers: FormikHelpers<FarmFormValues>) => {
     console.log('Valores a enviar:', values);
     return originalHandleSubmit(values, formikHelpers);
   };
 
-  // Buscar el código de la provincia cuando se carga un valor inicial
+  
   useEffect(() => {
     if (isEditing && initialValues?.provincia && provincias.length > 0) {
-      // Buscar la provincia por nombre (ahora usando label)
+      
       const provinciaEncontrada = provincias.find(
         p => p.label.toLowerCase() === initialValues.provincia.toLowerCase()
       );
@@ -206,7 +206,7 @@ const FarmForm = memo(({ onSubmit, initialValues, isEditing = false }: FarmFormP
                       setFieldValue('provincia', newValue.label);
                       setSelectedProvinciaCode(newValue.code);
                       setSelectedProvincia(newValue.code);
-                      // Limpiar municipio cuando cambia la provincia
+                      
                       setFieldValue('municipio', '');
                     } else {
                       setFieldValue('provincia', '');

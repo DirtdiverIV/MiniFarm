@@ -29,7 +29,7 @@ export const useFormTypes = (): UseFormTypesReturn => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Cargar tipos y provincias al montar el componente
+  
   useEffect(() => {
     const loadTypesData = async () => {
       try {
@@ -54,7 +54,7 @@ export const useFormTypes = (): UseFormTypesReturn => {
     loadTypesData();
   }, []);
 
-  // Cargar municipios cuando cambia la provincia seleccionada
+  
   useEffect(() => {
     const loadMunicipios = async () => {
       if (!selectedProvincia) {

@@ -4,8 +4,7 @@ import {
   Box, 
   Typography, 
   Container, 
-  Button,
-  Paper
+  Button
 } from '@mui/material';
 import { 
   Add as AddIcon,
@@ -20,19 +19,19 @@ import {
 import { alpha } from '@mui/material/styles';
 import { themeColors } from '../theme/theme';
 
-// Componentes
+
 import StatCard from '../components/StatCard';
 import AnimalsTable from '../components/AnimalsTable';
 import Loading from '../components/Loading';
 import AlertMessage from '../components/AlertMessage';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-// Hooks
+
 import { useApi } from '../hooks/useApi';
 import { useDialog } from '../hooks/useDialog';
 import { useAlert } from '../hooks/useAlert';
 
-// Servicios
+
 import { getFarmById, Farm } from '../services/farmService';
 import { getAnimalsByFarm, deleteAnimal, Animal } from '../services/animalService';
 
@@ -40,11 +39,11 @@ const FarmDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
-  // Hooks personalizados
+  
   const { alertOpen, alertMessage, alertSeverity, showAlert, closeAlert } = useAlert();
   const { isOpen: showConfirm, data: animalToDelete, openDialog: openConfirm, closeDialog: closeConfirm } = useDialog();
 
-  // APIs
+ 
   const farmApi = useApi<Farm>(async () => {
     if (!id) throw new Error('ID de granja requerido');
     const data = await getFarmById(parseInt(id));
@@ -78,7 +77,7 @@ const FarmDetails = () => {
     {
       onSuccess: () => {
         showAlert('Animal eliminado con éxito', 'success');
-        // Recargar la lista de animales
+      
         animalsApi.execute();
       },
       onError: (error) => {
@@ -87,7 +86,7 @@ const FarmDetails = () => {
     }
   );
 
-  // Cargar datos al montar el componente
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -103,7 +102,7 @@ const FarmDetails = () => {
     loadData();
   }, [id]);
 
-  // Manejadores de eventos
+
   const handleAddAnimal = () => {
     navigate(`/farms/${id}/animals/new`);
   };
@@ -130,12 +129,12 @@ const FarmDetails = () => {
     navigate('/');
   };
 
-  // Renderizar estado de carga
+  
   if ((farmApi.loading || animalsApi.loading) && !farmApi.data) {
     return <Loading message="Cargando datos de la granja..." />;
   }
 
-  // Si no hay granja (error o ID incorrecto)
+
   if (!farmApi.data && !farmApi.loading) {
     return (
       <Container maxWidth="lg">
@@ -159,7 +158,7 @@ const FarmDetails = () => {
   const farm = farmApi.data;
   const animals = animalsApi.data || [];
 
-  // Calcular estadísticas
+ 
   const totalAnimals = animals.length;
   const totalProduction = animals.reduce((sum, animal) => sum + animal.estimated_production, 0);
   const animalsWithIncidents = animals.filter(animal => animal.incidents && animal.incidents !== '').length;
@@ -168,7 +167,7 @@ const FarmDetails = () => {
     ? animals.reduce((sum, animal) => sum + animal.weight, 0) / animals.length 
     : 0;
   
-  // Determinar la unidad de producción según el tipo de producción de la granja
+
   const isLecheProduction = farm?.production_type?.name?.toLowerCase().includes('leche');
   const productionUnit = isLecheProduction ? 'litros/semana' : 'kg total estimado';
 

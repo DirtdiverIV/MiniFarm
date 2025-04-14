@@ -1,3 +1,4 @@
+// sonarignore:start
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { getDashboardStats, DashboardStats, AnimalWithIncident } from '../../services/dashboardService'
 import { api } from '../../services/api'
@@ -54,3 +55,4 @@ describe('dashboardService', () => {
     await expect(getDashboardStats()).rejects.toThrow()
   })
 }) 
+// sonarignore:end

@@ -72,7 +72,7 @@ const StatCard = ({ title, value, icon, color = 'default', unit, sx }: StatCardP
             lineHeight: 1
           })}
         >
-          {value}
+          {Math.round(value)}
         </Typography>
         {unit && (
           <Typography 

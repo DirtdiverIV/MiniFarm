@@ -18,18 +18,18 @@ import { Info as InfoIcon } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { useApi } from '../hooks/useApi';
 
-// Importar servicios y tipos
+
 import { getFarmById } from '../services/farmService';
 
-// Importar constantes y validaciones
+
 import { FARM_TYPE_TO_ANIMAL_TYPE } from '../constants/animalTypes';
 import { AnimalFormSchema } from '../validations/animalSchema';
 import Loading from './Loading';
 
-// Hooks personalizados
+
 import { useFormHandling } from '../hooks/useFormHandling';
 
-// Interfaces
+
 interface AnimalFormProps {
   onSubmit: (values: AnimalFormValues) => Promise<void>;
   initialValues?: AnimalFormValues;
@@ -60,7 +60,7 @@ const AnimalForm = memo(({
   const [productionType, setProductionType] = useState<{id: number, name: string} | undefined>();
   const { id } = useParams<{ id: string }>();
   
-  // Obtener el tipo de producción de la granja
+  
   const farmApi = useApi(async () => {
     if (!farmId && !id) return {
       success: false, 
@@ -89,12 +89,12 @@ const AnimalForm = memo(({
     }
   }, [farmApi.data]);
   
-  // Determinar si es producción láctea
+  
   const isLecheProduction = productionType?.name?.toLowerCase().includes('leche');
   const productionLabel = isLecheProduction ? 'Producción Láctea Estimada' : 'Producción Cárnica Estimada';
   const productionUnit = isLecheProduction ? 'litros/semana' : 'kg total';
   
-  // Valores iniciales por defecto
+  
   const defaultValues: AnimalFormValues = {
     farm_id: farmId ?? 0,
     animal_type: animalType,
@@ -119,7 +119,7 @@ const AnimalForm = memo(({
     isEditing
   });
 
-  // Cargar el tipo de granja al montar el componente
+  
   const loadFarmType = useCallback(async () => {
     if (farmId) {
       try {

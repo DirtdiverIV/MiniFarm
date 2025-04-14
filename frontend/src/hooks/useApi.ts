@@ -85,7 +85,6 @@ export const useApi = <T, P = any>(
   };
 };
 
-// Hook especializado para operaciones CRUD
 interface CrudOperations<T> {
   getAll: () => Promise<ApiResponse<T[]>>;
   getById: (id: number) => Promise<ApiResponse<T>>;

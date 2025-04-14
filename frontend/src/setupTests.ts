@@ -3,12 +3,12 @@ import { afterEach } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import { vi } from 'vitest'
 
-// Limpia automáticamente después de cada prueba
+
 afterEach(() => {
   cleanup()
 })
 
-// Suprimir errores de consola durante las pruebas
+
 const originalConsoleError = console.error
 console.error = (...args) => {
   if (
@@ -21,22 +21,22 @@ console.error = (...args) => {
   originalConsoleError(...args)
 }
 
-// Establecer vi.mock para MUI icons antes de que cualquier test lo utilice
+
 vi.mock('@mui/icons-material', () => {
-  // Crear un proxy que genere componentes mock bajo demanda
+  
   return new Proxy(
     {},
     {
       get: (target, prop) => {
-        // Si la propiedad ya existe en el target, devolverla
+        
         if (prop in target) {
           return target[prop as keyof typeof target];
         }
 
-        // Crear un componente mock
+        
         const component = () => null;
         
-        // Agregar métodos y propiedades comunes para simular un componente de React
+        
         Object.assign(component, {
           displayName: `MockedIcon(${String(prop)})`,
           muiName: 'SvgIcon',
@@ -44,7 +44,7 @@ vi.mock('@mui/icons-material', () => {
           render: () => null,
         });
         
-        // Guardar el componente en el target para futuras solicitudes
+        
         (target as Record<string, any>)[prop as string] = component;
         
         return component;
@@ -53,7 +53,7 @@ vi.mock('@mui/icons-material', () => {
   );
 });
 
-// También mockeamos otros componentes comunes que pueden causar problemas
+
 vi.mock('@mui/material/Fade', () => {
   return {
     default: ({ in: inProp, children }: { in: boolean; children: React.ReactNode }) => {
@@ -81,7 +81,7 @@ vi.mock('@mui/material/Alert', () => {
   };
 });
 
-// Agregamos mocks para todos los componentes de MUI utilizados en nuestros tests
+
 vi.mock('@mui/material/Table', () => ({ default: ({ children }: { children: React.ReactNode }) => children }));
 vi.mock('@mui/material/TableBody', () => ({ default: ({ children }: { children: React.ReactNode }) => children }));
 vi.mock('@mui/material/TableCell', () => ({ default: ({ children }: { children: React.ReactNode }) => children }));

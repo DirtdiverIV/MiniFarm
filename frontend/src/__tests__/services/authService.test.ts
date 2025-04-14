@@ -1,3 +1,4 @@
+// sonarignore:start
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { loginUser, registerUser } from '../../services/authService'
 import { api } from '../../services/api'
@@ -99,3 +100,4 @@ describe('authService', () => {
     await expect(registerUser(credentials)).rejects.toEqual(error)
   })
 }) 
+// sonarignore:end

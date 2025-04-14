@@ -7,7 +7,7 @@ import {
   Typography, 
   Alert
 } from '@mui/material';
-import { styled } from '@mui/material/styles'; // Importar styled
+import { styled } from '@mui/material/styles'; 
 import { Link as RouterLink } from 'react-router-dom';
 import { Form, Formik, Field } from 'formik';
 import * as Yup from 'yup';
@@ -27,7 +27,7 @@ interface AuthFormProps {
   onSubmit: (values: AuthFormValues) => Promise<void>;
 }
 
-// Esquemas de validación base
+
 const baseValidationSchema = {
   email: Yup.string()
     .email('Email inválido')
@@ -132,12 +132,12 @@ const AuthForm = ({ type, onSubmit }: AuthFormProps) => {
             initialValues={initialValues}
             validationSchema={isLogin ? loginSchema : registerSchema}
             onSubmit={async (values, { setSubmitting }) => {
-              clearError(); // Limpiar error anterior antes de intentar nuevo login
+              clearError(); 
               try {
                 await onSubmit(values);
               } catch (error) {
-                // Los errores ya se manejan en AuthContext
-                // pero se captura aquí para no interrumpir el flujo
+                
+                
                 console.error('Error en el formulario:', error);
               } finally {
                 setSubmitting(false);

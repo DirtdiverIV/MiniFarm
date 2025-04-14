@@ -1,8 +1,8 @@
+// sonarignore:start
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { getAllFarmTypes, getAllProductionTypes, getProvincias, getMunicipiosByProvincia, FarmType, ProductionType, Provincia, Municipio } from '../../services/typesService'
 import { api } from '../../services/api'
 import provinciasData from '../../assets/provincias.json'
-import poblacionesData from '../../assets/poblaciones.json'
 
 // Mock de axios/api
 vi.mock('../../services/api', () => ({
@@ -83,3 +83,4 @@ describe('typesService', () => {
     expect(result).toEqual([])
   })
 }) 
+// sonarignore:end

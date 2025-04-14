@@ -2,10 +2,6 @@ import { alpha } from '@mui/material/styles';
 import { themeColors } from './theme';
 import { Theme } from '@mui/material/styles';
 
-/**
- * Estilos comunes para componentes reutilizables
- * Elimina la duplicación de estilos en múltiples componentes
- */
 export const commonStyles = {
   cards: {
     base: {

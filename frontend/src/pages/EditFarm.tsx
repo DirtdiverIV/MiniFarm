@@ -8,26 +8,26 @@ import {
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 
-// Componentes
+
 import FarmForm, { FarmFormValues } from '../components/FarmForm';
 import AlertMessage from '../components/AlertMessage';
 import Loading from '../components/Loading';
 
-// Hooks
+
 import { useApi } from '../hooks/useApi';
 import { useAlert } from '../hooks/useAlert';
 
-// Servicios
+
 import { getFarmById, updateFarm } from '../services/farmService';
 
 const EditFarm = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
-  // Hooks personalizados
+  
   const { alertOpen, alertMessage, alertSeverity, showAlert, closeAlert } = useAlert();
 
-  // APIs
+  
   const farmApi = useApi<FarmFormValues>(async () => {
     if (!id) throw new Error('ID de granja requerido');
     const data = await getFarmById(parseInt(id));
@@ -69,12 +69,12 @@ const EditFarm = () => {
     }
   );
 
-  // Cargar datos al montar el componente
+  
   useEffect(() => {
     farmApi.execute();
   }, [id]);
 
-  // Manejador para la actualización de la granja
+  
   const handleSubmit = async (values: FarmFormValues) => {
     if (!id) {
       showAlert('ID de granja no válido', 'error');
@@ -87,7 +87,7 @@ const EditFarm = () => {
     });
   };
 
-  // Manejador para cancelar la edición
+  
   const handleCancel = () => {
     if (updateFarmApi.loading) {
       return;
@@ -95,7 +95,7 @@ const EditFarm = () => {
     navigate('/');
   };
 
-  // Renderizar estado de carga
+  
   if (farmApi.loading && !farmApi.data) {
     return <Loading message="Cargando datos de la granja..." />;
   }

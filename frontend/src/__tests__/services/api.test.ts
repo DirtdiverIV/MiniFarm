@@ -1,3 +1,4 @@
+// sonarignore:start
 import { describe, it, expect } from 'vitest'
 import { api } from '../../services/api'
 
@@ -6,3 +7,4 @@ describe('api service', () => {
     expect(api).toBeDefined()
   })
 }) 
+// sonarignore:end

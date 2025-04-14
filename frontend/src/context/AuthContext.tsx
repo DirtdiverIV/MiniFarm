@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser, registerUser } from '../services/authService';
 import { ApiError, ErrorCode } from '../types/errors';
 
-// Funciones de utilidad para el almacenamiento seguro
+
 const secureStorage = {
-  // Sanitiza el contenido antes de guardarlo
+  
   setItem: (key: string, value: any): void => {
     if (typeof value === 'object') {
       localStorage.setItem(key, JSON.stringify(value));
@@ -14,16 +14,16 @@ const secureStorage = {
     }
   },
   
-  // Obtiene y valida el contenido
+  
   getItem: <T,>(key: string, defaultValue: T | null = null): T | null => {
     const item = localStorage.getItem(key);
     if (!item) return defaultValue;
     
     try {
-      // Intentar parsear como JSON
+      
       return JSON.parse(item) as T;
     } catch (e) {
-      // Si no es JSON, devolver como string
+      
       return item as unknown as T;
     }
   },
@@ -33,7 +33,7 @@ const secureStorage = {
   }
 };
 
-// Definir tipos
+
 interface User {
   id: number;
   email: string;
@@ -62,10 +62,10 @@ interface AuthContextType {
   clearError: () => void;
 }
 
-// Crear contexto
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Proveedor del contexto
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const clearError = () => setError(null);
 
-  // Función para verificar si un token JWT ha expirado
+  
   const isTokenExpired = (token: string): boolean => {
     try {
       const base64Url = token.split('.')[1];
@@ -86,15 +86,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .join('')
       );
       const { exp } = JSON.parse(jsonPayload);
-      // Comparar la fecha de expiración con la fecha actual
+      
       return exp * 1000 < Date.now();
     } catch (error) {
-      // Si hay algún error al decodificar el token, asumir que ha expirado
+      
       return true;
     }
   };
 
-  // Verificar si hay un token en localStorage al cargar
+  
   useEffect(() => {
     const checkAuth = () => {
       const token = secureStorage.getItem<string>('token');
@@ -102,9 +102,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (token && userData) {
         try {
-          // Verificar si el token ha expirado
+          
           if (isTokenExpired(token)) {
-            // Si el token ha expirado, limpiar datos y dirigir al login
+            
             secureStorage.removeItem('token');
             secureStorage.removeItem('user');
             setUser(null);
@@ -112,7 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setUser(userData);
           }
         } catch (_) {
-          // Si hay un error, limpiar localStorage
+          
           secureStorage.removeItem('token');
           secureStorage.removeItem('user');
         }
@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
-  // Función para iniciar sesión
+  
   const login = async (credentials: LoginCredentials) => {
     setLoading(true);
     setError(null);
@@ -137,7 +137,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(response.user);
       navigate('/');
     } catch (error) {
-      // Asegurarnos de que el error sea del tipo correcto
+      
       if ((error as ApiError).code) {
         setError(error as ApiError);
       } else {
@@ -147,14 +147,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       }
       
-      // No redirigir en caso de error
+      
       return;
     } finally {
       setLoading(false);
     }
   };
 
-  // Función para registrar
+  
   const register = async (credentials: RegisterCredentials) => {
     setLoading(true);
     setError(null);
@@ -177,7 +177,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Función para cerrar sesión
+  
   const logout = () => {
     secureStorage.removeItem('token');
     secureStorage.removeItem('user');
@@ -199,7 +199,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Hook personalizado para usar el contexto
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

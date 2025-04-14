@@ -8,33 +8,33 @@ import {
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 
-// Componentes
+
 import FarmForm, { FarmFormValues } from '../components/FarmForm';
 import AlertMessage from '../components/AlertMessage';
 import Loading from '../components/Loading';
 
-// Servicios
+
 import { createFarm } from '../services/farmService';
 
 const NewFarm = () => {
   const navigate = useNavigate();
   
-  // Estados para UI
+  
   const [loading, setLoading] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('info');
   
-  // Función para mostrar alertas
+  
   const showAlert = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
     setAlertMessage(message);
     setAlertSeverity(severity);
     setAlertOpen(true);
   };
   
-  // Manejar la creación de la granja
+  
   const handleCreateFarm = async (values: FarmFormValues) => {
-    if (loading) return; // Prevenir múltiples envíos
+    if (loading) return; 
     
     setLoading(true);
     try {
@@ -48,7 +48,7 @@ const NewFarm = () => {
       });
       
       showAlert('Granja creada con éxito', 'success');
-      // Navegar inmediatamente después de mostrar el mensaje
+      
       navigate(`/farms/${createdFarm.id}`);
       
     } catch (error) {
@@ -58,12 +58,12 @@ const NewFarm = () => {
     }
   };
   
-  // Manejar el regreso al dashboard
+  
   const handleBack = () => {
     navigate('/');
   };
   
-  // Renderizar estado de carga
+  
   if (loading) {
     return <Loading message="Creando granja..." />;
   }

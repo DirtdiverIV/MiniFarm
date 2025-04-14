@@ -17,10 +17,12 @@ export interface ApiError {
 
 export interface ValidationError extends ApiError {
   code: ErrorCode.VALIDATION_ERROR;
-  details: {
-    field: string;
-    message: string;
-  }[];
+  details: Record<string, unknown> & {
+    validationErrors: Array<{
+      field: string;
+      message: string;
+    }>;
+  };
 }
 
 export type ErrorHandler = (error: unknown) => ApiError;

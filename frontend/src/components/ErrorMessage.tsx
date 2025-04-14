@@ -22,7 +22,7 @@ export const ErrorMessage = ({ error }: ErrorMessageProps) => {
     setOpen(false);
   };
 
-  // Para errores de validación, mostrar cada campo con error
+  
   if (error.code === ErrorCode.VALIDATION_ERROR && error.details) {
     return (
       <Collapse in={open}>
@@ -87,7 +87,7 @@ export const ErrorMessage = ({ error }: ErrorMessageProps) => {
     );
   }
 
-  // Para otros tipos de errores
+  
   return (
     <Collapse in={open}>
       <Alert 

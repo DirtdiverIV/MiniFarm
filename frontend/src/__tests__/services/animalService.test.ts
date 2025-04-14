@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+// sonarignore:start
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Animal, AnimalCreateData, getAnimalsByFarm, getAnimalById, createAnimal, updateAnimal, deleteAnimal } from '../../services/animalService'
 import { api } from '../../services/api'
 
@@ -108,3 +109,5 @@ describe('animalService', () => {
     await expect(getAnimalById(1)).rejects.toThrow()
   })
 }) 
+
+// sonarignore:end

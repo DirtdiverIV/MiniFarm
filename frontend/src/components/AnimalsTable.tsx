@@ -24,7 +24,7 @@ import { alpha } from '@mui/material/styles';
 import { themeColors } from '../theme/theme';
 import { useFilteredData } from '../hooks/useFilteredData';
 
-// Extendemos el tipo Animal para la versión del dashboard
+
 interface DashboardAnimal extends Animal {
   farm_name: string;
 }
@@ -44,47 +44,47 @@ const AnimalsTable = ({
   title = 'Animales',
   isDashboard = false
 }: AnimalsTableProps) => {
-  // Definir los campos de búsqueda según el tipo de tabla
+  
   const searchFields = isDashboard 
     ? ['animal_type', 'identification_number', 'farm_name']
     : ['animal_type', 'identification_number', 'sanitary_register'];
   
-  // Función de filtrado para nuestro hook
+  
   const filterAnimal = useCallback((animal: Animal | DashboardAnimal, term: string) => {
     const searchTerm = term.toLowerCase().trim();
     
     if (!searchTerm) return true;
     
-    // Verificar cada campo de búsqueda
+    
     return searchFields.some(field => {
       const value = (animal as any)[field];
       return value?.toString().toLowerCase().includes(searchTerm);
     });
   }, [searchFields]);
   
-  // Usar nuestro hook personalizado de filtrado
+  
   const { 
     filteredData, 
     setSearchTerm,
     searchTerm 
   } = useFilteredData<Animal | DashboardAnimal>(animals, filterAnimal);
   
-  // Estado para paginación
+  
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   
-  // Estado para ordenación
+  
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-  // Usar un tipo más genérico para orderBy ya que las columnas cambian
+  
   const [orderBy, setOrderBy] = useState<string>('identification_number'); 
 
-  // ---- Lógica de ordenación ----
   
-  // Función auxiliar para comparación descendente
+  
+  
   function descendingComparator(a: Animal | DashboardAnimal, b: Animal | DashboardAnimal, orderBy: string) {
     const key = orderBy as keyof (Animal | DashboardAnimal);
     
-    // Obtener valores, manejando el caso especial de farm_name
+    
     let valA: any = key in a ? a[key] : undefined;
     let valB: any = key in b ? b[key] : undefined;
 
@@ -93,19 +93,19 @@ const AnimalsTable = ({
       valB = (b as DashboardAnimal).farm_name;
     }
 
-    // Manejo de null/undefined y comparación
+    
     if (valA == null || valB == null) {
       return (valA == null && valB != null) ? 1 : (valB == null && valA != null) ? -1 : 0;
     }
     
-    // Comparación normal si ambos valores existen
+    
     return valB < valA ? -1 : valB > valA ? 1 : 0;
   }
 
-  // Tipo para la función de comparación
+  
   type Order = 'asc' | 'desc';
 
-  // Obtiene la función de comparación correcta según el orden y el campo
+  
   function getComparator(
     order: Order,
     orderBy: string,
@@ -115,7 +115,7 @@ const AnimalsTable = ({
       : (a, b) => -descendingComparator(a, b, orderBy);
   }
 
-  // Ordenación estable
+  
   function stableSort(array: readonly (Animal | DashboardAnimal)[], comparator: (a: Animal | DashboardAnimal, b: Animal | DashboardAnimal) => number) {
     const stabilizedThis = array.map((el, index) => [el, index] as [Animal | DashboardAnimal, number]);
     stabilizedThis.sort((a, b) => {
@@ -123,20 +123,20 @@ const AnimalsTable = ({
       if (order !== 0) {
         return order;
       }
-      return a[1] - b[1]; // Si son iguales, mantiene el orden original
+      return a[1] - b[1]; 
     });
     return stabilizedThis.map((el) => el[0]);
   }
   
-  // Manejador para solicitar la ordenación
+  
   const handleRequestSort = useCallback((property: string) => {
     setOrder(orderBy === property && order === 'asc' ? 'desc' : 'asc');
     setOrderBy(property);
   }, [order, orderBy]);
   
-  // ---- Fin Lógica de ordenación ----
+  
 
-  // Calcular datos ordenados y paginados
+  
   const sortedAndPaginatedData = useMemo(() => {
     const comparator = getComparator(order, orderBy);
     const sortedData = stableSort(filteredData, comparator);
@@ -145,7 +145,7 @@ const AnimalsTable = ({
     return sortedData.slice(startIndex, startIndex + rowsPerPage);
   }, [filteredData, order, orderBy, page, rowsPerPage]);
   
-  // Manejadores para paginación
+  
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -155,12 +155,12 @@ const AnimalsTable = ({
     setPage(0);
   };
 
-  // Función simple para verificar incidencias
+  
   const hasIncident = (incidents: string) => {
     return incidents && incidents.toLowerCase() !== 'ninguno' && incidents.trim() !== '';
   };
 
-  // Función para renderizar el contenido de una celda basado en el tipo de celda y datos del animal
+  
   const renderCellContent = useCallback((cell: HeadCell, animal: Animal | DashboardAnimal) => {
     const key = cell.id as keyof (Animal | DashboardAnimal);
     
@@ -188,11 +188,11 @@ const AnimalsTable = ({
       return (animal as DashboardAnimal).farm_name;
     }
     
-    // Valor predeterminado para otras celdas
+    
     return animal[key] != null ? String(animal[key]) : '-';
   }, [isDashboard]);
 
-  // Handlers memoizados para eventos de edición y eliminación
+  
   const handleEdit = useCallback((animal: Animal) => {
     if (onEditAnimal) {
       onEditAnimal(animal);
@@ -205,13 +205,13 @@ const AnimalsTable = ({
     }
   }, [onDeleteAnimal]);
 
-  // Definir las cabeceras de la tabla
+  
   interface HeadCell {
-    id: keyof Animal | keyof DashboardAnimal | 'actions'; // Incluye posibles claves y 'actions'
+    id: keyof Animal | keyof DashboardAnimal | 'actions'; 
     label: string;
     numeric: boolean;
     disablePadding?: boolean;
-    sortable: boolean; // Añadir propiedad para indicar si es ordenable
+    sortable: boolean; 
   }
   
   const headCells: readonly HeadCell[] = useMemo(() => {
@@ -232,7 +232,7 @@ const AnimalsTable = ({
     ];
 
     const incidentCell: HeadCell = { id: 'incidents', numeric: false, label: 'Incidencias', sortable: true };
-    const actionCell: HeadCell = { id: 'actions', numeric: false, label: 'Acciones', sortable: false }; // Acciones no son ordenables
+    const actionCell: HeadCell = { id: 'actions', numeric: false, label: 'Acciones', sortable: false }; 
 
     if (isDashboard) {
       return [...commonCells, ...dashboardCells, incidentCell];
@@ -241,51 +241,51 @@ const AnimalsTable = ({
     }
   }, [isDashboard]);
 
-  // Función para calcular el ancho de la celda
+  
   const getCellWidth = useCallback((headCell: HeadCell) => {
     if (headCell.id === 'incidents') return '35%';
     if (headCell.id === 'actions') return 100;
     return 'auto';
   }, []);
 
-  // Función para calcular el ancho mínimo de la celda
+  
   const getCellMinWidth = useCallback((headCell: HeadCell) => {
     if (headCell.id === 'incidents') return 150;
     if (headCell.numeric || headCell.id === 'identification_number') return 80;
     return undefined;
   }, []);
 
-  // Función para obtener los estilos del TableSortLabel
+  
   const getSortLabelStyles = useCallback((headCell: HeadCell) => {
-    // Determinar la dirección del texto según la alineación numérica
+    
     const labelFlexDirection = headCell.numeric ? 'row-reverse' : 'row';
     
-    // Determinar la alineación según la alineación numérica
+    
     const labelJustification = headCell.numeric ? 'flex-end' : 'flex-start';
     
-    // Determinar el color del icono según si está activo
+    
     const iconColor = orderBy === headCell.id 
       ? themeColors.primary.contrastText + ' !important' 
       : alpha(themeColors.primary.contrastText, 0.5);
     
-    // Determinar el margen del icono según la alineación numérica
+    
     const iconMarginLeft = headCell.numeric ? '8px' : '0';
     
     return {
-      // Forzar dirección para que el icono esté siempre después del texto
+      
       flexDirection: labelFlexDirection,
-      // Ajustar para que el label ocupe espacio disponible si es necesario
+      
       width: '100%',
       justifyContent: labelJustification,
       '& .MuiTableSortLabel-icon': {
         color: iconColor, 
-        // Añadir margen para separar icono del texto en celdas alineadas a la derecha
+        
         marginLeft: iconMarginLeft,
       },
       '&:hover': {
-        color: themeColors.primary.contrastText, // Color al pasar el ratón
+        color: themeColors.primary.contrastText, 
       },
-      color: themeColors.primary.contrastText, // Color del texto
+      color: themeColors.primary.contrastText, 
     };
   }, [orderBy, themeColors]);
 
@@ -340,7 +340,7 @@ const AnimalsTable = ({
                       {headCell.label}
                     </TableSortLabel>
                   ) : (
-                    headCell.label // Si no es ordenable, solo muestra la etiqueta
+                    headCell.label 
                   )}
                 </TableCell>
               ))}
@@ -349,10 +349,10 @@ const AnimalsTable = ({
           <TableBody>
             {sortedAndPaginatedData.length > 0 ? (
               sortedAndPaginatedData.map((animal, index) => {
-                // Obtenemos las celdas visibles para esta fila (depende de isDashboard)
-                const visibleCells = headCells.filter(cell => cell.id !== 'actions'); // Excluimos acciones aquí
                 
-                // Determinar el color de fondo de la fila según sea par o impar
+                const visibleCells = headCells.filter(cell => cell.id !== 'actions'); 
+                
+                
                 const rowBackgroundColor = index % 2 === 0
                   ? themeColors.surface.containerLowest
                   : themeColors.surface.containerLow;
@@ -373,12 +373,12 @@ const AnimalsTable = ({
                       return (
                         <TableCell 
                           key={cell.id}
-                          align={cell.numeric ? 'right' : 'left'} // Aplicar alineación
+                          align={cell.numeric ? 'right' : 'left'} 
                           sx={{ 
                             color: themeColors.text.primary, 
-                            whiteSpace: 'nowrap', // Evitar saltos de línea
-                            overflow: 'hidden', // Ocultar desbordamiento
-                            textOverflow: 'ellipsis' // Añadir puntos suspensivos si el contenido es muy largo
+                            whiteSpace: 'nowrap', 
+                            overflow: 'hidden', 
+                            textOverflow: 'ellipsis' 
                           }}
                         >
                           {renderCellContent(cell, animal)}

@@ -11,15 +11,15 @@ import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { useState } from 'react';
 import { alpha } from '@mui/material/styles';
 
-// Componentes
+
 import AnimalForm, { AnimalFormValues } from '../components/AnimalForm';
 import AlertMessage from '../components/AlertMessage';
 import Loading from '../components/Loading';
 
-// Hooks
+
 import { useAlert } from '../hooks/useAlert';
 
-// Servicios y tipos
+
 import { createAnimal } from '../services/animalService';
 
 const NewAnimal = () => {
@@ -27,10 +27,10 @@ const NewAnimal = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   
-  // Hooks personalizados
+  
   const { alertOpen, alertMessage, alertSeverity, showAlert, closeAlert } = useAlert();
   
-  // Manejador para la creación del animal
+  
   const handleSubmit = async (values: AnimalFormValues) => {
     if (!farmId || loading) {
       showAlert('ID de granja no válido', 'error');
@@ -45,7 +45,7 @@ const NewAnimal = () => {
       });
       
       showAlert('Animal creado exitosamente', 'success');
-      // Navegar inmediatamente después de mostrar el mensaje
+      
       navigate(`/farms/${farmId}`);
       
     } catch (error) {

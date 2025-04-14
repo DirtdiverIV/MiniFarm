@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { themeColors } from '../theme/theme';
 import { commonStyles } from '../theme/commonStyles';
 
-// Componentes
+
 import StatCard from '../components/StatCard';
 import FarmCard from '../components/FarmCard';
 import AnimalsTable from '../components/AnimalsTable';
@@ -27,24 +27,24 @@ import Notification from '../components/Notification';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PaginationControls from '../components/PaginationControls';
 
-// Hooks
+
 import { useApi } from '../hooks/useApi';
 import { useDialog } from '../hooks/useDialog';
 import { useAlert } from '../hooks/useAlert';
 import { useAnimalData } from '../hooks/useAnimalData';
 
-// Servicios
+
 import { getDashboardStats, DashboardStats } from '../services/dashboardService';
 import { getAllFarms, Farm, deleteFarm } from '../services/farmService';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   
-  // Hooks personalizados
+  
   const { alertOpen, alertMessage, alertSeverity, showAlert, closeAlert } = useAlert();
   const { isOpen: showConfirm, data: farmToDelete, openDialog: openConfirm, closeDialog: closeConfirm } = useDialog();
   
-  // APIs
+  
   const dashboardApi = useApi<DashboardStats>(async () => {
     const data = await getDashboardStats();
     return {
@@ -76,7 +76,7 @@ const Dashboard = () => {
     {
       onSuccess: () => {
         showAlert('Granja eliminada con éxito', 'success');
-        // Recargar la lista de granjas
+        
         farmsApi.execute();
       },
       onError: (error) => {
@@ -85,9 +85,9 @@ const Dashboard = () => {
     }
   );
 
-  // Cargar datos al montar el componente
+  
   useEffect(() => {
-    // Prevenir llamadas API innecesarias o bucles infinitos
+    
     if (dashboardApi.loading || farmsApi.loading) return;
     
     const loadData = async () => {
@@ -103,10 +103,10 @@ const Dashboard = () => {
     };
     
     loadData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Dependencias vacías para ejecutar solo al montar
+  
+  }, []); 
 
-  // Manejadores de eventos
+  
   const handleAddFarm = () => {
     navigate('/farms/new');
   };
@@ -133,10 +133,10 @@ const Dashboard = () => {
 
 
 
-  // Usar el hook personalizado para obtener los animales convertidos
+  
   const animalsWithIncidences = useAnimalData(dashboardApi.data?.animals_with_incidents || null);
 
-  // Renderizar estado de carga
+  
   if ((dashboardApi.loading || farmsApi.loading) && !dashboardApi.data && !farmsApi.data) {
     return <Loading message="Cargando datos del dashboard..." />;
   }
@@ -193,17 +193,17 @@ const Dashboard = () => {
             })}
           />
           <StatCard
-            title="Producción Cárnica"
+            title="Producción Cárnica Est."
             value={dashboardApi.data?.total_carne_production ?? 0}
             icon={<MeatIcon />}
-            unit="kgs est."
+            unit="kg"
             sx={() => ({ 
               ...commonStyles.cards.base,
               ...commonStyles.cards.primary
             })}
           />
           <StatCard
-            title="Producción Láctea"
+            title="Producción Láctea Est."
             value={dashboardApi.data?.total_leche_production ?? 0}
             icon={<WaterDropIcon />}
             unit="litros/semana"

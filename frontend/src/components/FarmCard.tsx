@@ -6,7 +6,6 @@ import {
   Button, 
   CardActions,
   Box,
-  Chip,
   IconButton,
   Tooltip,
   Divider

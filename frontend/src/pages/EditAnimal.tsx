@@ -8,26 +8,26 @@ import {
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 
-// Componentes
+
 import AnimalForm, { AnimalFormValues } from '../components/AnimalForm';
 import AlertMessage from '../components/AlertMessage';
 import Loading from '../components/Loading';
 
-// Servicios
+
 import { getAnimalById, updateAnimal } from '../services/animalService';
 
 const EditAnimal = () => {
   const { id, farmId } = useParams<{ id: string; farmId?: string }>();
   const navigate = useNavigate();
   
-  // Estados para datos y UI
+  
   const [initialValues, setInitialValues] = useState<AnimalFormValues | null>(null);
   const [loading, setLoading] = useState(true);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('info');
   
-  // Cargar datos del animal
+  
   useEffect(() => {
     const loadAnimalData = async () => {
       if (!id) return;
@@ -58,7 +58,7 @@ const EditAnimal = () => {
     loadAnimalData();
   }, [id]);
   
-  // Función para mostrar alertas
+  
   const showAlert = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
     setAlertMessage(message);
     setAlertSeverity(severity);
@@ -77,7 +77,7 @@ const EditAnimal = () => {
     return 0;
   };
 
-  // Manejar la actualización del animal
+  
   const handleUpdateAnimal = async (values: AnimalFormValues) => {
     if (!id) return;
     
@@ -97,7 +97,7 @@ const EditAnimal = () => {
       
       showAlert('Animal actualizado con éxito', 'success');
       
-      // Esperar un momento antes de redirigir para que el usuario vea el mensaje
+      
       setTimeout(() => {
         const farmIdToUse = getFarmIdFromUpdatedAnimal(updatedAnimal);
         navigate(`/farms/${farmIdToUse}`);
@@ -111,18 +111,18 @@ const EditAnimal = () => {
     }
   };
   
-  // Manejar el regreso a la página de detalles de granja
+  
   const handleBack = () => {
     const farmIdToUse = getFarmIdFromInitialValues();
     navigate(`/farms/${farmIdToUse}`);
   };
   
-  // Renderizar estado de carga
+  
   if (loading && !initialValues) {
     return <Loading message="Cargando datos del animal..." />;
   }
   
-  // Si hay un error o no hay datos
+  
   if (!initialValues && !loading) {
     return (
       <Container maxWidth="md">

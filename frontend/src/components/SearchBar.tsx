@@ -20,10 +20,6 @@ interface SearchBarProps {
   showClearButton?: boolean;
 }
 
-/**
- * Componente de barra de búsqueda reutilizable
- * Incluye manejo de limpieza y debounce para evitar búsquedas innecesarias
- */
 const SearchBar = ({
   onSearch,
   placeholder = 'Buscar...',
@@ -39,12 +35,12 @@ const SearchBar = ({
     const value = e.target.value;
     setSearchTerm(value);
     
-    // Limpia el timeout anterior si existe
+    
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
     
-    // Establece un nuevo timeout para el debounce
+    
     const timeoutId = setTimeout(() => {
       onSearch(value);
     }, debounceTime);
